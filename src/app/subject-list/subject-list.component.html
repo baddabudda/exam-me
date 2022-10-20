@@ -1,0 +1,5 @@
+<div class="subject_container layout" *ngIf="subjects.length">
+    <a class="subject_card" *ngFor="let subject of subjects" routerLink="/subject/{{subject.id}}">
+        <span>{{subject.name}}</span>
+    </a>
+</div>

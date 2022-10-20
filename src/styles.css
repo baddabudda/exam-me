@@ -1,0 +1,21 @@
+*{
+    box-sizing: border-box;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+body {
+    background-color: #D2D2BA;
+    margin: 0;
+    padding: 0;
+  }
+.layout{
+    max-width: 1280px;
+    margin: auto;
+    width: 80%;
+    min-height: 75vh;
+    margin-top: 5%;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
