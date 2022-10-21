@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { QuestionComponent } from './question/question.component';
 import { SubjectComponent } from './subject/subject.component';
 import { SubjectListComponent } from './subject-list/subject-list.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { SubjectListComponent } from './subject-list/subject-list.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
