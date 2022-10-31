@@ -9,7 +9,7 @@ Exam.me
 Наборы статей, составленные по примерным спискам экзаменационных вопросов (статья является ответом на один из вопросов списка). 
 В конечном итоге они могут представлять собой краткое изложение всего курса и использоваться для закрепления изученного материала при подготовке к экзаменам.
 # Данные
-![image](https://user-images.githubusercontent.com/63803498/198683702-8e4af755-1ecc-4c37-becf-c1bbb2080d68.png)
+![image](https://user-images.githubusercontent.com/63803498/199043622-8e4dd4a5-10f1-4ff1-b8a9-214dcf18e7a9.png)
 - Student - информация о пользователях
 - Group - информация об академических группах
 - Faculty - информация о факультете
@@ -71,6 +71,7 @@ Exam.me
 | --- | --- | --- |
 | question_id | int | да, primary key |
 | list_id | int | да, foreign key |
+| student_id | int | да, foreign key |
 | last_edit_date | datetime | — |
 | quest_order | int | — |
 | question_title | varchar(45) | — |
@@ -81,6 +82,7 @@ Exam.me
 | version_id | int | да, primary key |
 | last_edit_date | datetime | да, primary key |
 | list_id | int | да, foreign key |
+| student_id | int | да, foreign key |
 | question_id | int | да, foreign key |
 | quest_order | int | — |
 | question_title | varchar(45) | — |
@@ -117,7 +119,7 @@ Exam.me
     - возможность добавлять/удалять записи в таблицах Faculty, Educational Program
     - редактировать/удалять записи в таблице User
 - Староста академической группы (Group Admin):
-    - Редактировать размер и наполнение списка вопросов
+    - Редактировать размер списка вопросов
     - Предоставить другим группам доступ к просмотру/редактированию конкретного списка вопросов
     - Сделать список вопросов общедоступным (могут просматривать все посетители сайта)
     - Блокировать участникам группы доступ к редактированию статей
