@@ -11,6 +11,7 @@ import { WelcomeComponent } from "./components/welcome/welcome.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { FooterComponent } from "./components/footer.component";
 import { SubjectComponent } from "./components/subject/subject.component";
+import { QuestionComponent } from "./components/question/question.component";
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { SubjectComponent } from "./components/subject/subject.component";
     WelcomeComponent,
     FooterComponent,
     SubjectComponent,
+    QuestionComponent,
   ],
   imports: [
     BrowserModule,

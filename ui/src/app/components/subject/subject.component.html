@@ -4,9 +4,10 @@
             <h2 class="headig_card" style="margin-bottom: 1em;">ПУБЛИЧНЫЕ СПИСКИ</h2>
             <div class="wrapper" *ngIf="lists.length; else empty">
                 <tui-island size="s" class="list_card" *ngFor="let list of lists">
-                    <h3 class="headig_card">{{list.name}}</h3>
-                    <p class="tui-island__paragraph">{{list.group_name}}, {{list.subject_name}} </p>
-                
+                    <a style="text-decoration: none;" routerLink="/list" queryParamsHandling='merge' [queryParams]="{list_id: list.id}">
+                        <h3 class="headig_card">{{list.name}}</h3>
+                        <p class="tui-island__paragraph">{{list.group_name}}, {{list.subject_name}} </p>
+                    </a>
                 </tui-island>
             </div>
 
@@ -19,7 +20,7 @@
                     [value]="subject.id==sub_id"
                     (click)="subject_choose((subject.id==sub_id) ? undefined : subject.id )"> 
                     </tui-primitive-checkbox>
-                    <span>{{subject.name}}</span>    
+                    <span >{{subject.name}}</span>    
                 </div>
             </div>
             

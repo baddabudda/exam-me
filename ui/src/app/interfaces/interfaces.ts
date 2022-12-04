@@ -11,5 +11,12 @@ export interface list{
     subject_name: string,
     name: string,
     // is_public: boolean,
-    // semestr: number
+    semestr?: number
+    }
+
+export interface question{
+    id: number,
+    name: string,
+    list_id: number,
+    last_change: string
     }
