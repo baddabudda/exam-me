@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { subject, SubjectService } from 'src/app/services/subject.service';
+import {SubjectService } from 'src/app/services/subject.service';
+import { subject } from '../../interfaces/interfaces';
 
 @Component({
     selector: 'welcome',
@@ -19,10 +20,15 @@ export class WelcomeComponent implements OnInit {
         console.log(this.search.controls.text.value);
         this.search.reset();
     }
-    subgectsGet(){
+    subgectsGet(active: boolean){
         if(this.subjectListGetted){
-            this.subjectService.getSubjects().subscribe(res => this.subjectList=res)
-            this.subjectListGetted = false
+            this.subjectService.getSubjects().subscribe(res => {
+                this.subjectList=res;
+                this.subjectListOpened = active;
+            })
+            this.subjectListGetted = false;
+        } else {
+            this.subjectListOpened = active;
         }
     }
 

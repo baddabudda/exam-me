@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { timer, of, map } from 'rxjs';
-export interface subject{
-name: string,
-id: number
-}
+import { subject } from '../interfaces/interfaces';
+
 
 @Injectable({providedIn: 'root'})
 export class SubjectService {
@@ -11,10 +9,7 @@ constructor() { }
 
 getSubjects(){
 
-    return timer(1000).pipe(map(() => {
-        console.log('req')
-        return subjects
-    }));
+    return of(subjects)
 }
 }
 
@@ -26,5 +21,6 @@ export const subjects: subject[] = [
 {name: 'История', id: 4},
 {name: 'Компьютерная графика', id: 5},
 {name: 'Теория игр', id: 6},
-{name: 'Теория функций комплексных переменных', id: 7}
+{name: 'Теория функций комплексных переменных', id: 7},
+{name: 'Математическая логика', id: 8}
 ]
