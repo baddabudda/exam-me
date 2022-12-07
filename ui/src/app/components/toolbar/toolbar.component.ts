@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Route, Router } from '@angular/router';
-import { tap } from 'rxjs';
 import { question } from 'src/app/interfaces/interfaces';
 import { QuestionService } from 'src/app/services/question.service';
 
@@ -18,12 +17,12 @@ export class ToolbarComponent implements OnInit {
     findQuestions: question[] = [];
     questionListOpened = false;
     error: string | null = null;
-    question_id: number = -1;
 
     constructor(
         private router: Router,
         private questionService: QuestionService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private cdRef: ChangeDetectorRef
     ) {
         router.events.subscribe(ev=>{
         if(ev instanceof NavigationEnd){
@@ -37,6 +36,9 @@ export class ToolbarComponent implements OnInit {
         }
     }) }
 
+    redirect(link: string){
+        this.router.navigate([link])
+    }
     onSubmit(event: any){
         const text = this.search.value['text'];
         if(text){

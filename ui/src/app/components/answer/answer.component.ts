@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { concatMap } from 'rxjs';
 import { question } from 'src/app/interfaces/interfaces';
@@ -35,7 +35,6 @@ import { FormControl } from '@angular/forms';
         },
     ], 
     changeDetection: ChangeDetectionStrategy.OnPush,
-
 })
 
 export class AnswerComponent implements OnInit {
@@ -47,11 +46,11 @@ export class AnswerComponent implements OnInit {
     constructor(private route: ActivatedRoute,
         private questionService : QuestionService,
         private router: Router,
-        private location: Location) {
-            route.params.pipe(
-                concatMap(params=>(this.questionService.getQuestion(params['question_id'])))
-            ).subscribe(res=>{this.question=res; this.control.setValue(res.body)}, error=>location.back());
-            }
+        private location: Location,
+        private cdRef: ChangeDetectorRef
+        ) {
+           
+        }
     on_edit(){
         this.editing=true;
     }
@@ -61,5 +60,13 @@ export class AnswerComponent implements OnInit {
         this.questionService.putQuestion(this.question).subscribe(res=>{this.question=res; this.control.setValue(res.body)}, error=>this.location.back());
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+        this.route.params.pipe(
+            concatMap(params=>(this.questionService.getQuestion(params['question_id'])))
+        ).subscribe(res=>{
+            this.question=res; 
+            this.control.setValue(res.body);
+            this.cdRef.detectChanges();
+        }, error=>this.location.back());
+     }
 }

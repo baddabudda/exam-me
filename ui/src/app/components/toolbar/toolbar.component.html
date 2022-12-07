@@ -32,12 +32,15 @@
         </a>
         <div class="tui-col_lg-1 tui-col_md-1 tui-col_xs-1 hideOnMobile"></div>
         <div class="tui-col_lg-8 tui-col_md-8 tui-col_xs-12">
-            <form [formGroup]="search" class="search" (ngSubmit)="onSubmit($event)" style="outline:none;">
-                <tui-input (tuiActiveZoneChange)="questionListOpened=questionListOpened && $event"
+            <form [formGroup]="search" class="search" (ngSubmit)="onSubmit($event)"
+                (tuiActiveZoneChange)="questionListOpened=questionListOpened && $event"
                 [tuiDropdown]="questionListTemplate"
                 [tuiDropdownDirection]="'bottom'" 
+                [tuiDropdownMaxHeight]="400"
                 [tuiDropdownLimitWidth]="'fixed'" 
-                [tuiDropdownManual]="questionListOpened" tuiTextfieldSize="s" formControlName="text" [tuiTextfieldLabelOutside]="true" [pseudoFocus]="false">
+                [tuiDropdownManual]="questionListOpened"
+            >
+                <tui-input  tuiTextfieldSize="s" formControlName="text" [tuiTextfieldLabelOutside]="true" [pseudoFocus]="false">
                     Введите вопрос
                     <input  autocomplete="off" tuiTextfield/>
                 </tui-input>
@@ -50,13 +53,15 @@
 </div>
 
 <ng-template #questionListTemplate>
-    <div class="subjList" tuiAutoFocus tabindex="0">
+    <div class="subjList" tuiAutoFocus>
         <a tuiButton 
         class="subjectButton"
         appearance="secondary" 
         *ngFor="let question of findQuestions"
+        size="s"
         routerLink="/list/{{question.list_id}}/question/{{question.id}}"
-        size="s">
+        (click)="questionListOpened = false"
+    >
         {{question.name}}</a>
     </div>
  </ng-template>

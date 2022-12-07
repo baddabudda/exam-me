@@ -8,6 +8,7 @@ export class QuestionService {
     getQuestions(list_id: number){
         return(of(questions.filter(question=>(question.list_id==list_id))))
     }
+    // TODO list_id check
     getQuestion(question_id: number){
         const res = (questions.find(question=>(question.id==question_id)));
         return(res?of(res):throwError(()=>'not found'))
