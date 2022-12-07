@@ -9,14 +9,21 @@
             <span *ngFor="let i of 'EXAM.ME'.split('')">{{i}}</span> 
         </div>
     </div>
-    <div class="tui-row tui-row_adaptive">
-        <form [formGroup]="search" class="tui-col_lg-10 tui-col_md-12 tui-col_xs-12 search" (ngSubmit)="onSubmit($event)" style="outline:none;">
-            <tui-input tuiTextfieldSize="m" formControlName="text" [tuiTextfieldLabelOutside]="true" [pseudoFocus]="false">
+
+    <div class="tui-row tui-row_adaptive" >
+        <form [formGroup]="search" class="tui-col_lg-10 tui-col_md-12 tui-col_xs-12 search" (ngSubmit)="onSubmit($event)" >
+            <tui-input (tuiActiveZoneChange)="questionListOpened=questionListOpened && $event"
+            [tuiDropdown]="questionListTemplate"
+            [tuiDropdownDirection]="'bottom'" 
+            [tuiDropdownLimitWidth]="'fixed'" 
+            [tuiDropdownManual]="questionListOpened" tuiTextfieldSize="m" formControlName="text" [tuiTextfieldLabelOutside]="true" [pseudoFocus]="false">
                 Введите вопрос
-                <input  tuiTextfield/>
-            </tui-input>
-            <button tuiButton size="m" appearance="primary" type="submit">Go!</button>
+                <input autocomplete="off" tuiTextfield/>
+        </tui-input>
+            <button 
+            tuiButton size="m" appearance="primary" type="submit">Go!</button>
         </form>
+        <tui-error [error]="error"></tui-error>
     </div>
 
     <div class="tui-row tui-row_adaptive">
@@ -43,9 +50,9 @@
         </div>
     </div>
 </div>
-<!-- 
-<div (tuiActiveZoneChange)="subjectListOpened = $event; subgectsGet()"
-[tuiDropdown]="subjectListTemplate"
+
+<!-- <div (tuiActiveZoneChange)="subjectListOpened = $event; subgectsGet()"
+[tuiDropdown]="questionListTemplate"
 [tuiDropdownDirection]="'bottom'" 
 [tuiDropdownLimitWidth]="'fixed'" 
 [tuiDropdownManual]="subjectListOpened" 
@@ -54,15 +61,16 @@ style="text-align: center;">
    <span class='subjListSwitch' [style.color]="subjectListOpened ? '#09151B' : '#052A32'" > 
        или перейдите к списку предметов 
    </span>
-</div>
-<ng-template #subjectListTemplate>
-   <div class='subjList'>
+</div> -->
+
+<ng-template #questionListTemplate>
+   <div class="subjList" tuiAutoFocus tabindex="0">
        <a tuiButton 
+       class="subjectButton"
        appearance="secondary" 
-       *ngFor="let subject of subjectList" 
-       class="subjectButton" 
-       routerLink="/subject/{{subject.id}}"
+       *ngFor="let question of findQuestions"
+       routerLink="/list/{{question.list_id}}/question/{{question.id}}"
        size="s">
-       {{subject.name}}</a>
+       {{question.name}}</a>
    </div>
-</ng-template> -->
+</ng-template>

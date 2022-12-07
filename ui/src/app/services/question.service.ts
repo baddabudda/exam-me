@@ -20,6 +20,12 @@ export class QuestionService {
         return of(questions[ind]=ques);
     }
 
+    findQuestion(naming: string){
+        const search = naming.toLowerCase()
+        const res = questions.filter(question=>(question.name.toLowerCase().includes(search)));
+        return of(res);
+    }
+
     }
     
 export const questions: question[] = [

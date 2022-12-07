@@ -1,27 +1,42 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd, Route, Router } from '@angular/router';
+import { tap } from 'rxjs';
+import { question } from 'src/app/interfaces/interfaces';
 import { QuestionService } from 'src/app/services/question.service';
-import {SubjectService } from 'src/app/services/subject.service';
-import { subject, question } from '../../interfaces/interfaces';
 
 @Component({
-    selector: 'welcome',
-    templateUrl: 'welcome.component.html',
-    styleUrls: ['welcome.component.less']
+    selector: 'toolbar',
+    templateUrl: 'toolbar.component.html',
+    styleUrls: ['toolbar.component.less']
 })
 
-export class WelcomeComponent implements OnInit {
+export class ToolbarComponent implements OnInit {
     search = new FormGroup({text: new FormControl('')});
-    subjectListOpened = false;
-    subjectListGetted = true;
-    subjectList :subject[] = [];
+    toolbar_hide: boolean = false;
+    bottombar_hide: boolean = false;
     findQuestions: question[] = [];
     questionListOpened = false;
     error: string | null = null;
+    question_id: number = -1;
 
     constructor(
-        private subjectService : SubjectService,
-        private questionService: QuestionService ) { }
+        private router: Router,
+        private questionService: QuestionService,
+        private route: ActivatedRoute
+    ) {
+        router.events.subscribe(ev=>{
+        if(ev instanceof NavigationEnd){
+            if(ev.url.includes('login') || ev.url.includes('registrate')){this.bottombar_hide=true; this.toolbar_hide=true}
+            else{
+                if(ev.url.includes('welcome')){this.bottombar_hide=true; this.toolbar_hide=false}
+                else{
+                    this.bottombar_hide=false; 
+                    this.toolbar_hide=false;}
+                }
+        }
+    }) }
+
     onSubmit(event: any){
         const text = this.search.value['text'];
         if(text){
@@ -49,18 +64,5 @@ export class WelcomeComponent implements OnInit {
             duration
         )
     }
-
-    subgectsGet(active: boolean){
-        if(this.subjectListGetted){
-            this.subjectService.getSubjects().subscribe(res => {
-                this.subjectList=res;
-                this.subjectListOpened = active;
-            })
-            this.subjectListGetted = false;
-        } else {
-            this.subjectListOpened = active;
-        }
-    }
-
     ngOnInit() { }
 }

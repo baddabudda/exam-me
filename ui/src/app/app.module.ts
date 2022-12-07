@@ -13,6 +13,7 @@ import { FooterComponent } from "./components/footer.component";
 import { SubjectComponent } from "./components/subject/subject.component";
 import { QuestionComponent } from "./components/question/question.component";
 import { AnswerComponent } from "./components/answer/answer.component";
+import { ToolbarComponent } from "./components/toolbar/toolbar.component";
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { AnswerComponent } from "./components/answer/answer.component";
     FooterComponent,
     SubjectComponent,
     QuestionComponent,
-    AnswerComponent
+    AnswerComponent,
+    ToolbarComponent
   ],
   imports: [
     BrowserModule,

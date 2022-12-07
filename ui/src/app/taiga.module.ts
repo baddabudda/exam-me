@@ -1,7 +1,15 @@
 import { NgModule } from "@angular/core";
-import { TuiTextfieldControllerModule, TuiButtonModule, TuiDropdownModule, TuiLinkModule, TuiExpandModule, TuiPrimitiveCheckboxModule } from "@taiga-ui/core";
+import { 
+    TuiTextfieldControllerModule, 
+    TuiButtonModule, 
+    TuiDropdownModule, 
+    TuiLinkModule, 
+    TuiExpandModule, 
+    TuiPrimitiveCheckboxModule,
+    TuiErrorModule
+} from "@taiga-ui/core";
 import {TuiInputModule, TuiIslandModule} from '@taiga-ui/kit';
-import {TuiActiveZoneModule} from '@taiga-ui/cdk';
+import {TuiActiveZoneModule, TuiAutoFocusModule} from '@taiga-ui/cdk';
 import {
     TuiAlignContentModule,
     TuiCodeModule,
@@ -71,6 +79,8 @@ import {
     TuiTextColorModule,
     TuiTiptapEditorModule,
     TuiAlignContentModule,
-    TuiToolbarModule
+    TuiToolbarModule,
+    TuiAutoFocusModule,
+    TuiErrorModule
 ]})
 export class TaigaModule{}
