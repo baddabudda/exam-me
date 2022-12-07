@@ -8,7 +8,7 @@ import { QuestionService } from 'src/app/services/question.service';
 @Component({
     selector: 'selector-name',
     templateUrl: 'question.component.html',
-    styleUrls:['question.component.less']
+    styleUrls:['../subject/subject.component.less']
 })
 
 export class QuestionComponent implements OnInit {
@@ -18,13 +18,12 @@ export class QuestionComponent implements OnInit {
     constructor(private route: ActivatedRoute,
         private questionService : QuestionService,
         private listService : ListService,
-        private router: Router,) {
-            route.queryParams.pipe(
+        private router: Router) {
+            route.params.pipe(
                 tap(params=>(this.list_id=params['list_id'])),
                 concatMap(params=>(this.questionService.getQuestions(this.list_id)))
-            ).subscribe(res=>(this.questions=res));
-            console.log(this.questions);
-            this.listService.getList(this.list_id).subscribe(sub=>sub?this.list_=sub: 0);
+            ).subscribe(res=>(this.questions=res.sort((a, b)=>a.order-b.order)));
+            this.listService.getList(this.list_id).subscribe(sub=>this.list_=sub, error=>router.navigate(['/subject']));
             }
 
     ngOnInit() { }

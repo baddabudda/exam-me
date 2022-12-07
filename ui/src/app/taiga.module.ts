@@ -2,6 +2,36 @@ import { NgModule } from "@angular/core";
 import { TuiTextfieldControllerModule, TuiButtonModule, TuiDropdownModule, TuiLinkModule, TuiExpandModule, TuiPrimitiveCheckboxModule } from "@taiga-ui/core";
 import {TuiInputModule, TuiIslandModule} from '@taiga-ui/kit';
 import {TuiActiveZoneModule} from '@taiga-ui/cdk';
+import {
+    TuiAlignContentModule,
+    TuiCodeModule,
+    TuiColorEditModule,
+    TuiColorPickerModule,
+    TuiColorSelectorModule,
+    TuiDetailsModule,
+    TuiEditLinkModule,
+    TuiEditorImagePreviewModule,
+    TuiEditorModule,
+    TuiEditorSocketModule,
+    TuiFlatPickerModule,
+    TuiFontSizeModule,
+    TuiFontStyleModule,
+    TuiHighlightColorModule,
+    TuiImageEditorModule,
+    TuiInputColorModule,
+    TuiLinearMultiPickerModule,
+    TuiLinearPickerModule,
+    TuiListConfigsModule,
+    TuiPaletteModule,
+    TuiTableCellColorModule,
+    TuiTableCreateModule,
+    TuiTableMergeCellsModule,
+    TuiTableRowColumnManagerModule,
+    TuiTableSizeSelectorModule,
+    TuiTextColorModule,
+    TuiTiptapEditorModule,
+    TuiToolbarModule
+} from '@taiga-ui/addon-editor';
 
 @NgModule({
     exports: [
@@ -13,6 +43,34 @@ import {TuiActiveZoneModule} from '@taiga-ui/cdk';
     TuiLinkModule,
     TuiExpandModule,
     TuiIslandModule,
-    TuiPrimitiveCheckboxModule
+    TuiPrimitiveCheckboxModule,  
+    TuiCodeModule,
+    TuiColorEditModule,
+    TuiColorPickerModule,
+    TuiColorSelectorModule,
+    TuiDetailsModule,
+    TuiEditLinkModule,
+    TuiEditorImagePreviewModule,
+    TuiEditorModule,
+    TuiEditorSocketModule,
+    TuiFlatPickerModule,
+    TuiFontSizeModule,
+    TuiFontStyleModule,
+    TuiHighlightColorModule,
+    TuiImageEditorModule,
+    TuiInputColorModule,
+    TuiLinearMultiPickerModule,
+    TuiLinearPickerModule,
+    TuiListConfigsModule,
+    TuiPaletteModule,
+    TuiTableCellColorModule,
+    TuiTableCreateModule,
+    TuiTableMergeCellsModule,
+    TuiTableRowColumnManagerModule,
+    TuiTableSizeSelectorModule,
+    TuiTextColorModule,
+    TuiTiptapEditorModule,
+    TuiAlignContentModule,
+    TuiToolbarModule
 ]})
 export class TaigaModule{}

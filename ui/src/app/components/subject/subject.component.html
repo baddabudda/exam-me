@@ -4,8 +4,8 @@
             <h2 class="headig_card" style="margin-bottom: 1em;">ПУБЛИЧНЫЕ СПИСКИ</h2>
             <div class="wrapper" *ngIf="lists.length; else empty">
                 <tui-island size="s" class="list_card" *ngFor="let list of lists">
-                    <a style="text-decoration: none;" routerLink="/list" queryParamsHandling='merge' [queryParams]="{list_id: list.id}">
-                        <h3 class="headig_card">{{list.name}}</h3>
+                    <a style="text-decoration: none;" routerLink="/list/{{list.id}}">
+                        <h3 class="headig_card" style="text-transform: capitalize ;">{{list.name}}</h3>
                         <p class="tui-island__paragraph">{{list.group_name}}, {{list.subject_name}} </p>
                     </a>
                 </tui-island>
@@ -27,4 +27,8 @@
         </div>
     </div>
 </div>
-<ng-template #empty>ПУБЛИЧНЫЕ СПИСКИ ДЛЯ ДАННОГО ПРЕДМЕТА ОТСУТСТВУЮТ</ng-template>
+<ng-template #empty>
+    <span *ngIf="sub_id;">
+        ПУБЛИЧНЫЕ СПИСКИ ДЛЯ ДАННОГО ПРЕДМЕТА ОТСУТСТВУЮТ
+    </span>
+</ng-template>

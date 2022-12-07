@@ -12,6 +12,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { FooterComponent } from "./components/footer.component";
 import { SubjectComponent } from "./components/subject/subject.component";
 import { QuestionComponent } from "./components/question/question.component";
+import { AnswerComponent } from "./components/answer/answer.component";
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { QuestionComponent } from "./components/question/question.component";
     FooterComponent,
     SubjectComponent,
     QuestionComponent,
+    AnswerComponent
   ],
   imports: [
     BrowserModule,

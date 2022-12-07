@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { list } from '../interfaces/interfaces';
 
 @Injectable({providedIn: 'root'})
@@ -10,7 +10,8 @@ export class ListService {
 
     }
     getList(list_id: number){
-        return(of(lists.find(list=>(list.id==list_id))))
+        const res = lists.find(list=>(list.id==list_id));
+        return res?of(res):throwError(()=>'not found')
 
     }
     

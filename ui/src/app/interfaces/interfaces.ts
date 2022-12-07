@@ -18,5 +18,7 @@ export interface question{
     id: number,
     name: string,
     list_id: number,
-    last_change: string
+    last_change: string,
+    order: number,
+    body: string,
     }
