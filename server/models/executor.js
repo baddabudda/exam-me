@@ -15,4 +15,4 @@ module.exports.queryExecute = ({ query, params, single }) => {
             reject(err);
         }
     });
-}
+};
