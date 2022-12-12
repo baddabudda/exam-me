@@ -22,3 +22,12 @@ export interface question{
     order: number,
     body: string,
     }
+
+export interface user{
+    id: number,
+    name: string,
+    Lastname: string,
+    Fname: string,
+    group_id: number,
+    sid: string
+}

@@ -1,8 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Route, Router } from '@angular/router';
-import { question } from 'src/app/interfaces/interfaces';
+import { question, user } from 'src/app/interfaces/interfaces';
+import { AuthService } from 'src/app/services/auth.service';
 import { QuestionService } from 'src/app/services/question.service';
+import { Vk_App_Id } from 'src/config';
 
 @Component({
     selector: 'toolbar',
@@ -17,13 +19,17 @@ export class ToolbarComponent implements OnInit {
     findQuestions: question[] = [];
     questionListOpened = false;
     error: string | null = null;
+    user?: user;
 
     constructor(
         private router: Router,
         private questionService: QuestionService,
         private route: ActivatedRoute,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private authService: AuthService
+
     ) {
+        authService.currentUser.subscribe(ev => this.user = ev ? ev : undefined)
         router.events.subscribe(ev=>{
         if(ev instanceof NavigationEnd){
             if(ev.url.includes('login') || ev.url.includes('registrate')){this.bottombar_hide=true; this.toolbar_hide=true}
@@ -66,5 +72,11 @@ export class ToolbarComponent implements OnInit {
             duration
         )
     }
+
+    getVkOuthLink(){
+        return `https://oauth.vk.com/authorize?client_id=${Vk_App_Id}&display=popup&redirect_uri=${window.location.origin}/login&scope=&response_type=token&v=5.59`
+    }
+
+
     ngOnInit() { }
 }

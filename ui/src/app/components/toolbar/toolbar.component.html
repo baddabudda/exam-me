@@ -1,6 +1,6 @@
 <div class="tui-container tui-container_fullwidth" *ngIf="!toolbar_hide">
     <div class="tui-row tui-row_adaptive toolbar">
-        <span>
+        <span *ngIf="user">
             <button
             tuiButton
             appearance="mono"
@@ -15,15 +15,22 @@
                 Моя группа
             </button>
         </span>
+        <span class="spacer"></span>
         <span>
-            <button
+            <a
+            *ngIf="!user; else username"
             tuiButton
             appearance="mono"
             size='m'
-            routerLink="/login"> 
+            href='{{getVkOuthLink()}}'> 
                 Войти
-            </button>
+            </a>
         </span>
+        <ng-template #username>
+            <span *ngIf="user">
+                {{user.name}} {{user.Lastname}}
+            </span>
+        </ng-template>
     </div>
 </div>
 <div class="tui-container tui-container_adaptive" style="margin: 1.5em auto 3em auto;" *ngIf="!bottombar_hide">
