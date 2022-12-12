@@ -14,6 +14,7 @@ import { SubjectComponent } from "./components/subject/subject.component";
 import { QuestionComponent } from "./components/question/question.component";
 import { AnswerComponent } from "./components/answer/answer.component";
 import { ToolbarComponent } from "./components/toolbar/toolbar.component";
+import { LoginComponent } from "./components/login/login.component";
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { ToolbarComponent } from "./components/toolbar/toolbar.component";
     SubjectComponent,
     QuestionComponent,
     AnswerComponent,
-    ToolbarComponent
+    ToolbarComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,

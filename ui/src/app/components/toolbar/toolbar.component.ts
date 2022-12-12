@@ -28,7 +28,7 @@ export class ToolbarComponent implements OnInit {
         if(ev instanceof NavigationEnd){
             if(ev.url.includes('login') || ev.url.includes('registrate')){this.bottombar_hide=true; this.toolbar_hide=true}
             else{
-                if(ev.url.includes('welcome')){this.bottombar_hide=true; this.toolbar_hide=false}
+                if(ev.url=='/' || ev.url.includes('welcome')){this.bottombar_hide=true; this.toolbar_hide=false}
                 else{
                     this.bottombar_hide=false; 
                     this.toolbar_hide=false;}
