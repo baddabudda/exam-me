@@ -1,44 +1,54 @@
 const executor = require('./executor.js');
-const pool = require('../config/config.js');
+// const pool = require('../config/config.js');
 
-module.exports.getQuestionsByListId = (listId => {
-    return executor.queryExecute({
+module.exports.getQuestionsByListId = ({ listId }) => {
+    return executor.execute({
         query:
             "SELECT * FROM question WHERE list_id = ?",
         params: [listId],
         single: false
     });
-});
+};
 
-// module.exports.createQuestion = async ({}) => {
-//     connection = await pool.promise().getConnection();
-//     await connection.execute('SET TRANSACTION ISOLATION LEVEL READ COMMITED');
-//     await connection.beginTransaction();
+module.exports.checkInDatabase = ({ questId }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM question WHERE question_id = ?",
+        params: [questId],
+        single: true
+    })
+}
 
-//     try {
-//         await connection.execute(
-//             "LOCK TABLE question WRITE",
-//             []
-//         )
+module.exports.checkOrder = ({ listId, order }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM question WHERE list_id = ? AND question_order = ?",
+        params: [listId, order],
+        single: true
+    });
+};
 
-//         await connection.execute(
-//             "INSERT INTO question (list_id, edit_date, " +
-//             "question_order, question_title, question_body, is_deleted) " +
-//             "VALUES (?, ?, ?, ?, ?, ?)",
-//             [listId, editDate, questOrder, questTitle, questBody, 0]
-//         );
+module.exports.createQuestion = ({ connection, listId, userId, date, order, title, body}) => {
+    return executor.execute({
+        connection: connection,
+        query:
+            "INSERT INTO question (list_id, user_id, edit_date, " +
+            "question_order, question_title, question_body, is_deleted) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        params: [listId, userId, date, order, title, body, 0],
+        single: true
+    });
+};
 
-//         let questId = await connection.execute(
-//             "SELECT LAST_INSERT_ID()",
-//             []
-//         )
-
-//         await connection.execute(
-//             "INSERT INTO versioned (edit_date, list_id, " +
-//             "user_id, question_id, question_order, question_title," + 
-//             "question_body, is_deleted) " +
-//             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-//             [listId, editDate, questOrder, questTitle, questBody, 0]
-//         );
-//     }
-// };
+module.exports.createVersion = ({connection, date, listId, userId, questId, title, body}) => {
+    return executor.execute({
+        connection: connection,
+        query:
+            "INSERT INTO versioned (edit_date, list_id, " +
+            "user_id, question_id, question_title," + 
+            "question_body, is_deleted) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        params: [date, listId, userId, questId, title, body],
+        single: true
+    });
+};

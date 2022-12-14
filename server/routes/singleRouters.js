@@ -4,7 +4,7 @@ const router = express.Router();
 
 // === CONTROLLERS ===
 const subjectController = require('../controllers/subjectController.js');
-const listController = require()
+//const listController = require()
 
 // subject router
 router.get('/subjects', subjectController.getAllSubjects);

@@ -3,7 +3,7 @@ const executor = require('./executor.js');
 
 // getting specific subject by subject_id
 module.exports.getSubjectById = (subjId => {
-    return executor.queryExecute({
+    return executor.execute({
         query:
             "SELECT * FROM subjects WHERE subject_id = ?",
         params: [subjId],
@@ -13,7 +13,7 @@ module.exports.getSubjectById = (subjId => {
 
 // getting all subjects from table subjects
 module.exports.getAllSubjects = () => {
-    return executor.queryExecute({
+    return executor.execute({
         query:
             "SELECT * FROM subjects",
         params: [],
