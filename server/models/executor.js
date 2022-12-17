@@ -1,4 +1,4 @@
-const pool = require('../config/config.js');
+const { pool } = require('../config/config.js');
 
 // universal query function: both types of connections acceptable
 module.exports.execute = ({ connection, query, params, single}) => {
@@ -10,7 +10,7 @@ module.exports.execute = ({ connection, query, params, single}) => {
                 connection = await pool.promise().getConnection();
                 result = await connection.execute(query, params);
                 pool.releaseConnection(connection);
-                resolve(single ? rs[0][0] : rs[0]);
+                resolve(single ? result[0][0] : result[0]);
             } catch (error) {
                 console.error(error);
                 reject(new Error('Query cannot be executed'));

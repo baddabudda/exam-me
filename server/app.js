@@ -10,9 +10,9 @@ const cookieSession = require('cookie-session');
 const keys = require('./config/keys.js');
 // --- routing ---
 const singleRoutes = require('./routes/singleRouters.js');
-//const authRoutes = require('./routes/authRouter.js');
+const authRoutes = require('./routes/authRouter.js');
 //const profileRoutes = require('./routes/profileRouter.js');
-//const passportSetup = require('./config/passport-setup.js');
+const passportSetup = require('./config/passport-setup.js');
 
 // === DOTENV CONFIG ===
 require('dotenv').config();
@@ -44,3 +44,4 @@ app.use(passport.session());
 
 // --- routing ---
 app.use(singleRoutes);
+app.use('/auth', authRoutes);

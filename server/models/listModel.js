@@ -31,3 +31,13 @@ module.exports.getPublicBySubjId = (subjId => {
         single: false
     });
 });
+
+// get list's length
+module.exports.getListLengthById = ({ listId }) => {
+    return executor.execute({
+        query:
+            "SELECT COUNT(*) FROM lists WHERE list_id = ?",
+        params: [listId],
+        single: true
+    });
+}

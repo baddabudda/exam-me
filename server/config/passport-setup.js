@@ -2,19 +2,26 @@
 const passport = require('passport');
 const VKStrategy = require('passport-vkontakte').Strategy;
 const keys = require('./keys.js');
-const user = require('../models/userModel.js');
+const userModel = require('../models/userModel.js');
 
 // === (DE)SERIALIATION ===
-passport.serializeUser((profileData, done) => {
-    done(null, profileData.vkId);
+// which data of user must be stored in the session
+passport.serializeUser((user, done) => {
+    console.log('serializing')
+    done(null, user.user_id);
  });
  
- passport.deserializeUser((vkId, done) => {
-     user.find_by_vkId(vkId)
-     .then(currentUser => {
-         console.log(currentUser);
-         done(null, currentUser);
-     })
+ // attaches user object to req.user
+ passport.deserializeUser((db_id, done) => {
+    console.log(db_id)
+    userModel.getUserById({ db_id: db_id })
+    .then(currentUser => {
+        console.log(currentUser);
+        done(null, currentUser);
+    }).
+    catch (err => {
+        console.error(err);
+    });
  });
  
  // === CREATING STRATEGY FOR VK AUTHENTICATION ===
@@ -26,25 +33,21 @@ passport.serializeUser((profileData, done) => {
              callbackURL: "/auth/vk/redirect",
              profileFields: ["id", "first_name", "last_name"],
              lang: "ru"
-         },
-         (
-             req, 
-             accessToken, 
-             refreshToken, 
-             params, 
-             profile, 
-             done
-         ) => {
-             let profileData = {
-                 vkId: profile._json.id,
-                 fname: profile._json.first_name,
-                 lname: profile._json.last_name
-             };
- 
-             // We will call done for all successful authorizations
-             // so we will serialize all vk users and give then cookies
-             // after serializing we will check user in db
-             done(null, profileData);
+         }, async (req, accessToken, refreshToken, params, profile, done) => {
+            // check whether user with such vk_id exists in database
+            let user = await userModel.getUserByVkId({ vk_id: profile._json.id });
+            // console.log(user);
+            if (!user){
+                await userModel.createUser({
+                    vk_id: profile._json.id,
+                    fname: profile._json.first_name,
+                    lname: profile._json.last_name
+                });
+
+                user = await userModel.getUserByVkId({ vk_id: profile._json.id });
+            }
+            // pass user during authorization
+            done(null, user);
          }
      )
  );
