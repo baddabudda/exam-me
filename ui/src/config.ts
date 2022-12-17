@@ -1,0 +1,1 @@
+export const Vk_App_Id='51501155';
