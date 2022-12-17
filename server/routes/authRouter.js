@@ -10,6 +10,6 @@ router.get('/vk', passport.authenticate("vkontakte"));
 // router for redirecting after successful authorization
 router.get('/vk/redirect', passport.authenticate("vkontakte"), authController.redirect);
 // router for signing out
-router.get('/sign-out', authController.signOut);
+router.get('/log-out', authController.logOut);
 
 module.exports = router;

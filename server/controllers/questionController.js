@@ -4,20 +4,20 @@ const errorHandler = require('../utils/errorHandler.js');
 const pool = require('../config/config.js');
 
 // check whether question with a given order is present in the list
-const isOccupied = async(res, req) => {
-    try {
-        let orderCheck = await question.checkOrder(req.body.list_id, req.body.order);
+// const isOccupied = async(res, req) => {
+//     try {
+//         let orderCheck = await question.checkOrder(req.body.list_id, req.body.order);
 
-        if (orderCheck) {
-            return true;
-        }
-    } catch (error) {
-        console.error(error);
-        throw new Error('Cannot check order');
-    };
+//         if (orderCheck) {
+//             return true;
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         throw new Error('Cannot check order');
+//     };
     
-    return false;
-}
+//     return false;
+// }
 
 // check contents from form
 const checkContents = (contents) => {
@@ -120,7 +120,7 @@ module.exports.createQuestion_post = async (req, res) => {
                 throw new Error('Cannot create new question');
             }
     } catch (error) {
-        errorHandler(res, { message: error });
+        errorHandler(res, { message: error.message });
     };
 
     // if there were no error, redirect
@@ -213,7 +213,7 @@ module.exports.editQuestion_post = async (req, res) => {
                 throw new Error('Cannot update question');
             }
     } catch (error) {
-        errorHandler(res, { message: error });
+        errorHandler(res, { message: error.message });
     };
 
     // if there were no errors, redirect
@@ -268,7 +268,7 @@ module.exports.deleteQuestion_delete = async (req, res) => {
                 throw new Error('Cannot delete question');
             }
     } catch (error) {
-        errorHandler(res, { message: error });
+        errorHandler(res, { message: error.message });
     }
 }
 
@@ -335,6 +335,6 @@ module.exports.changeOrder_post = async (req, res) => {
             throw new Error('Cannot update question order');
         }
     } catch (error) {
-        errorHandler(res, { message: error });
+        errorHandler(res, { message: error.message });
     }
 }

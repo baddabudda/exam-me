@@ -11,6 +11,7 @@ const keys = require('./config/keys.js');
 // --- routing ---
 const singleRoutes = require('./routes/singleRouters.js');
 const authRoutes = require('./routes/authRouter.js');
+const profileRoutes = require('./routes/profileRouter');
 //const profileRoutes = require('./routes/profileRouter.js');
 const passportSetup = require('./config/passport-setup.js');
 
@@ -45,3 +46,4 @@ app.use(passport.session());
 // --- routing ---
 app.use(singleRoutes);
 app.use('/auth', authRoutes);
+app.use('/profile', profileRoutes);
