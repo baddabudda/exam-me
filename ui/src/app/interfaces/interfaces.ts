@@ -1,17 +1,17 @@
 export interface subject{
-    name: string,
-    id: number
+    subject_name: string,
+    subject_id: number
     }
 
 export interface list{
-    id: number,
-    // group_id: number,
+    list_id: number,
+    group_id?: number,
     group_name: string,
     subject_id: number,
     subject_name: string,
-    name: string,
-    // is_public: boolean,
-    semestr?: number
+    list_name: string,
+    is_public: boolean,
+    semester?: number
     }
 
 export interface question{

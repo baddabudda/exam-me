@@ -2,11 +2,11 @@
 const express = require('express');
 const router = express.Router();
 
-// === CONTROLLERS ===
-const subjectController = require('../controllers/subjectController.js');
-//const listController = require()
 
-// subject router
-router.get('/subjects', subjectController.getAllSubjects);
+const listRouter = require('./listRouter');
+const subjectRouter = require('./subjectRouter');
+
+router.use('/subjects', subjectRouter);
+router.use('/list', listRouter);
 
 module.exports = router;

@@ -41,9 +41,9 @@
                         *ngFor="let subject of subjectList" 
                         class="subjectButton" 
                         routerLink="/subject"
-                        [queryParams]="{sub_id: subject.id}"
+                        [queryParams]="{sub_id: subject.subject_id}"
                         size="s">
-                        {{subject.name}}</a>
+                        {{subject.subject_name}}</a>
                     </div>
                 </tui-expand>
             </div>

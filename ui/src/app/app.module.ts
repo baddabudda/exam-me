@@ -16,6 +16,7 @@ import { AnswerComponent } from "./components/answer/answer.component";
 import { ToolbarComponent } from "./components/toolbar/toolbar.component";
 import { LoginComponent } from "./components/login/login.component";
 import { VkComponent } from "./components/Vk.component";
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { VkComponent } from "./components/Vk.component";
     TaigaModule,
     FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
 ],
   providers: [{provide: TUI_SANITIZER, useClass: NgDompurifySanitizer}],
   bootstrap: [AppComponent]

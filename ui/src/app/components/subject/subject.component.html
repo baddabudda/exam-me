@@ -4,9 +4,9 @@
             <h2 class="headig_card" style="margin-bottom: 1em;">ПУБЛИЧНЫЕ СПИСКИ</h2>
             <div class="wrapper" *ngIf="lists.length; else empty">
                 <tui-island size="s" class="list_card" *ngFor="let list of lists">
-                    <a style="text-decoration: none;" routerLink="/list/{{list.id}}">
-                        <h3 class="headig_card" style="text-transform: capitalize ;">{{list.name}}</h3>
-                        <p class="tui-island__paragraph">{{list.group_name}}, {{list.subject_name}} </p>
+                    <a style="text-decoration: none;" routerLink="/list/{{list.list_id}}">
+                        <h3 class="headig_card" style="text-transform: capitalize ;">{{list.list_name}}</h3>
+                        <p class="tui-island__paragraph">{{list.group_name ? list.group_name + ', ' : ''}} {{list.subject_name}} </p>
                     </a>
                 </tui-island>
             </div>
@@ -15,12 +15,11 @@
         <div class="tui-col_lg-4 tui-col_md-4 tui-col_xs-12">
             <div size="s" class="filter_conteiner">
                 <h3 class="headig_card" style="margin-bottom: 1em;">ФИЛЬТР ПРЕДМЕТОВ</h3>
-                <div class="checkbox" [class.active]="subject.id==sub_id" *ngFor="let subject of subjects">
+                <div class="checkbox" [class.active]="subject.subject_id==sub_id" *ngFor="let subject of subjects"
+                (click)="subject_choose((subject.subject_id==sub_id) ? undefined : subject.subject_id )"> 
                     <tui-primitive-checkbox 
-                    [value]="subject.id==sub_id"
-                    (click)="subject_choose((subject.id==sub_id) ? undefined : subject.id )"> 
-                    </tui-primitive-checkbox>
-                    <span >{{subject.name}}</span>    
+                    [value]="subject.subject_id==sub_id"></tui-primitive-checkbox>
+                    <span >{{subject.subject_name}}</span>    
                 </div>
             </div>
             

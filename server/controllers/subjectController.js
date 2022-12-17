@@ -7,9 +7,12 @@ module.exports.getAllSubjects = async (req, res) => {
         if (!subjects) {
             throw {code: 500, message: 'could not get subjects!'};
         } else {
-            res.status(200).json({ subjects });
+            res.status(200).json( subjects );
+            return;
         }
     } catch (error) {
+        console.log(error);
         errorHandler(res, error);
+        return;
     };
 };

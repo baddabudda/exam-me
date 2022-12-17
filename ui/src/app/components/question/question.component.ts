@@ -14,7 +14,7 @@ import { QuestionService } from 'src/app/services/question.service';
 export class QuestionComponent implements OnInit {
     questions: question[]=[];
     list_id:number=-1
-    list_:list={id: -1, group_name: '', subject_id: -1, subject_name: '', name: '', semestr: -1}
+    list_?:list;
     constructor(private route: ActivatedRoute,
         private questionService : QuestionService,
         private listService : ListService,

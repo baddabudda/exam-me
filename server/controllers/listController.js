@@ -4,7 +4,7 @@ const errorHandler = require('../utils/errorHandler.js');
 module.exports.getPublicBySubjectId = async (req, res) => {
     if (!isNan(parseInt(req.params.subject_id))){
         const lists = await list.getPublicBySubjId(req.params.subject_id);
-        res.status(200).json({ lists });
+        res.status(200).json( lists );
     } else {
         const lists = await list.getAllLists();
     }
@@ -12,13 +12,19 @@ module.exports.getPublicBySubjectId = async (req, res) => {
 
 module.exports.getListById = async (req, res) => {
     try{
-        if (!isNan(parseInt(req.params.list_id))){
-            const currentList = await list.getById(req.params.list_id);
-            res.status(200).json({ currentList });
+        const list_id = req.params.list_id;
+        console.log(list_id)
+
+        if (!isNan(parseInt(list_id))){
+            const currentList = await list.getById(list_id);
+            res.status(200).json( currentList );
         } else {
             throw {code: 400, message: 'list_id is not a number!'};
         }
     } catch (err) {
-        errorHandler(res, error);
+        console.log(err);
+        errorHandler(res, err);
     }
 }
+
+const isNan = (val) => val === NaN;
