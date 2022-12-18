@@ -1,6 +1,7 @@
 const list = require('../models/listModel.js');
 const errorHandler = require('../utils/errorHandler.js');
 
+// get all public lists by subject_id
 module.exports.getPublicBySubjectId = async (req, res) => {
     if (!isNan(parseInt(req.params.subject_id))){
         const lists = await list.getPublicBySubjId(req.params.subject_id);
@@ -9,6 +10,7 @@ module.exports.getPublicBySubjectId = async (req, res) => {
         const lists = await list.getAllLists();
     }
 };
+
 
 module.exports.getListById = async (req, res) => {
     try{

@@ -31,3 +31,44 @@ module.exports.closeGroup = ({ group_id }) => {
         single: true
     });
 }
+
+// assign token
+module.exports.assignToken = ({ group_id, access_token }) => {
+    return executor.execute({
+        query:
+            "UPDATE academgroups SET access_token = ? WHERE group_id = ?",
+        params: [access_token, group_id],
+        single: true
+    });
+}
+
+// get group by id
+module.exports.getGroupById = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM academgroups WHERE group_id = ?",
+        params: [group_id],
+        single: true
+    });
+}
+
+// get group info
+module.exports.getGroupInfoById = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM academgroups, faculty, program" +
+            "WHERE group_id = ? AND academgroups.faculty_id = faculty.faculty_id AND academgroups.program_id = program.program_id",
+        params: [group_id],
+        single: true
+    });
+}
+
+// get group admin
+module.exports.getGroupAdmin = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT group_admin FROM academgroups WHERE group_id = ?",
+        params: [group_id],
+        single: true
+    });
+}

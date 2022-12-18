@@ -9,9 +9,10 @@ const cookieSession = require('cookie-session');
 // --- Configuration, etc. ---
 const keys = require('./config/keys.js');
 // --- routing ---
-const singleRoutes = require('./routes/singleRouters.js');
 const authRoutes = require('./routes/authRouter.js');
+const groupRoutes = require('./routes/groupRouter.js');
 const profileRoutes = require('./routes/profileRouter');
+const singleRoutes = require('./routes/singleRouters.js');
 //const profileRoutes = require('./routes/profileRouter.js');
 const passportSetup = require('./config/passport-setup.js');
 
@@ -47,3 +48,4 @@ app.use(passport.session());
 app.use(singleRoutes);
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
+app.use('/group', groupRoutes);

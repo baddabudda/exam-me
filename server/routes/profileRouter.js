@@ -1,9 +1,11 @@
+// library dependencies
 const express = require('express');
 const router = express.Router();
+// local dependencies
 const profileController = require('../controllers/profileController.js');
-const passport = require('passport');
+const authHandler = require('../utils/authHandler.js');
 
-router.get('/', profileController.profile_get);
-router.post('/edit', profileController.editProfile_post);
+router.get('/', authHandler, profileController.profile_get);
+router.post('/edit', authHandler, profileController.editProfile_post);
 
 module.exports = router;

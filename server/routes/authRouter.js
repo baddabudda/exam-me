@@ -1,15 +1,16 @@
+// library dependencies
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController.js');
 const passport = require('passport');
+// local dependencies
+const authController = require('../controllers/authController.js');
+const authHandler = require('../utils/authHandler.js');
 
-// router for sign in
-// router.get('/sign-in', authController.signIn_get);
 // router for passpot authentication
 router.get('/vk', passport.authenticate("vkontakte"));
-// router for redirecting after successful authorization
+// router for redirecting after successful authorization: firing cb function in strategy
 router.get('/vk/redirect', passport.authenticate("vkontakte"), authController.redirect);
 // router for signing out
-router.get('/log-out', authController.logOut);
+router.get('/log-out', authHandler(req, res, next), authController.logOut);
 
 module.exports = router;

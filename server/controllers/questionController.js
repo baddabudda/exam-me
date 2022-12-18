@@ -1,23 +1,10 @@
-const question = require('../models/questionModel.js');
-const list = require('../models/listModel.js');
-const errorHandler = require('../utils/errorHandler.js');
+// library dependencies
 const pool = require('../config/config.js');
-
-// check whether question with a given order is present in the list
-// const isOccupied = async(res, req) => {
-//     try {
-//         let orderCheck = await question.checkOrder(req.body.list_id, req.body.order);
-
-//         if (orderCheck) {
-//             return true;
-//         }
-//     } catch (error) {
-//         console.error(error);
-//         throw new Error('Cannot check order');
-//     };
-    
-//     return false;
-// }
+// local dependencies
+const questionModel = require('../models/questionModel.js');
+const listModel = require('../models/listModel.js');
+const userModel = require('../models/userModel.js');
+const errorHandler = require('../utils/errorHandler.js');
 
 // check contents from form
 const checkContents = (contents) => {
@@ -41,7 +28,7 @@ const checkContents = (contents) => {
         pass = false;
     }
 
-    return {pass, errors};
+    return { pass, errors };
 }
 
 // GET-request for creating question
@@ -54,7 +41,7 @@ module.exports.createQuestion_post = async (req, res) => {
     // various checks required I guess
     try {
         // check whether question with such order exists
-        let orderCheck = await question.checkOrder({
+        let orderCheck = await questionModel.checkOrder({
             listId: req.body.list_id,
             order: req.body.order
         });
@@ -85,7 +72,7 @@ module.exports.createQuestion_post = async (req, res) => {
                 // make queries
                 let date = Date.now() / 1000;
                 // insert new row into question table
-                await question.createQuestion({ 
+                await questionModel.createQuestion({ 
                     connection: connection, 
                     listId: req.body.list_id,
                     userId: req.user.id, 
@@ -97,7 +84,7 @@ module.exports.createQuestion_post = async (req, res) => {
                 // get id of recently created question (for that connection)
                 let quest_id = await connection.execute("SELECT LAST_INSERT_ID()");
                 // insert new version into versioned table
-                await question.createVersion({ 
+                await questionModel.createVersion({ 
                     connection: connection, 
                     date: date, 
                     listId: req.body.list_id,
@@ -136,7 +123,7 @@ module.exports.editQuestion_get = (req, res) => {
 module.exports.editQuestion_post = async (req, res) => {
     try {
         // check whether question with passed id exits in database
-        let checkExistence = await question.checkInDatabase({
+        let checkExistence = await questionModel.checkInDatabase({
             questId: req.body.question_id,
             listId: req.body.list_id
         });
@@ -146,7 +133,7 @@ module.exports.editQuestion_post = async (req, res) => {
         }
 
         // check whether question with such order exists
-        let orderCheck = await question.checkOrder({
+        let orderCheck = await questionModel.checkOrder({
             listId: req.body.list_id,
             order: req.body.order
         });
@@ -177,12 +164,12 @@ module.exports.editQuestion_post = async (req, res) => {
                 let date = Date.now() / 1000;
 
                 // lock record's editing for other connections in question table
-                await question.selectQuestionForUpdate({
+                await questionModel.selectQuestionForUpdate({
                     connection: connection,
                     questId: req.body.question_id
                 });
 
-                await question.updateQuestion({
+                await questionModel.updateQuestion({
                     connection: connection,
                     questId: req.body.question_id,
                     date: date,
@@ -192,7 +179,7 @@ module.exports.editQuestion_post = async (req, res) => {
                 });
 
                 // place current question record to versioned
-                await question.createVersion({ 
+                await questionModel.createVersion({ 
                     connection: connection, 
                     date: date, 
                     listId: req.body.list_id,
@@ -224,7 +211,7 @@ module.exports.editQuestion_post = async (req, res) => {
 module.exports.deleteQuestion_delete = async (req, res) => {
     try {
         // check whether requested record belongs to the list 
-        let checkExistence = await question.checkInDatabase({
+        let checkExistence = await questionModel.checkInDatabase({
             questId: req.body.question_id,
             listId: req.body.list_id
         });
@@ -245,13 +232,13 @@ module.exports.deleteQuestion_delete = async (req, res) => {
                 await connection.beginTransaction();
 
                 // lock record's editing for other connections in question table
-                await question.selectQuestionForUpdate({
+                await questionModel.selectQuestionForUpdate({
                     connection: connection,
                     questId: req.body.question_id
                 });
 
                 // mark record as deleted
-                await question.markDeleted({
+                await questionModel.markDeleted({
                     connection: connection,
                     listId: req.body.list_id,
                     questId: req.body.question_id
@@ -294,7 +281,7 @@ module.exports.changeOrder_post = async (req, res) => {
             throw new Error('Reordering list contains repeating values');
         }
         // check if orders' length matches list's length
-        if (ids.length !== await list.getListLengthById({listId: req.body.list_id })){
+        if (ids.length !== await listModel.getListLengthById({listId: req.body.list_id })){
             throw new Error('Requested arrays size does not match lists size');
         }
 
@@ -312,8 +299,8 @@ module.exports.changeOrder_post = async (req, res) => {
 
             for(let i = 0; i < id.length; i++){
                 // check whether question with such id belongs to that list; if yes then update order
-                if (await question.checkInDatabase({ questId: ids[i], listId: req.body.list_id })){
-                    await question.updateOrder({
+                if (await questionModel.checkInDatabase({ questId: ids[i], listId: req.body.list_id })){
+                    await questionModel.updateOrder({
                         connection: connection,
                         listId: req.body.list_id,
                         questId: ids[i],
@@ -338,3 +325,32 @@ module.exports.changeOrder_post = async (req, res) => {
         errorHandler(res, { message: error.message });
     }
 }
+
+module.exports.showVersions_get = async (req, res) => {
+    try {
+        if (!await userModel.checkPrivilege({ user_id: req.user.user_id })) {
+            throw new Error ("Access denied: no privilege to preview versions");
+        }
+
+        let versions = await questionModel.getVersionsByQuestionId({ questId: req.body.question_id });
+        res.status(200).json(versions);
+    } catch (error) {
+        errorHandler({ res: res, code: 500, error: error.message });
+    }
+}
+
+// check whether question with a given order is present in the list
+// const isOccupied = async(res, req) => {
+//     try {
+//         let orderCheck = await question.checkOrder(req.body.list_id, req.body.order);
+
+//         if (orderCheck) {
+//             return true;
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         throw new Error('Cannot check order');
+//     };
+    
+//     return false;
+// }
