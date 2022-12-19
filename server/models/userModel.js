@@ -52,26 +52,6 @@ module.exports.changeStatus = ({ user_id }) => {
     });
 }
 
-// check whether user is admin or not
-module.exports.checkPrivilege = ({ user_id }) => {
-    return executor.execute({
-        query:
-            "SELECT COUNT(*) FROM academgroups WHERE group_admin = ?",
-        params: [user_id],
-        single: true
-    });
-}
-
-// get users by group
-module.exports.getAllGroupMembers = ({ group_id }) => {
-    return executor.execute({
-        query:
-            "SELECT * FROM users WHERE group_id = ?",
-        params: [group_id],
-        single: false
-    });
-}
-
 // join group
 module.exports.joinGroup = ({ user_id, group_id }) => {
     return executor.execute({

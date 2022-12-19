@@ -11,9 +11,9 @@ const keys = require('./config/keys.js');
 // --- routing ---
 const authRoutes = require('./routes/authRouter.js');
 const groupRoutes = require('./routes/groupRouter.js');
-const profileRoutes = require('./routes/profileRouter');
 const singleRoutes = require('./routes/singleRouters.js');
-//const profileRoutes = require('./routes/profileRouter.js');
+const profileRoutes = require('./routes/profileRouter.js');
+const questionRoutes = require('./routes/questionRouter.js');
 const passportSetup = require('./config/passport-setup.js');
 
 // === DOTENV CONFIG ===
@@ -49,3 +49,4 @@ app.use(singleRoutes);
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
 app.use('/group', groupRoutes);
+app.use('/list', questionRoutes);

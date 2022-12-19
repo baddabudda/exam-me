@@ -2,6 +2,27 @@
 const executor = require('./executor.js');
 const pool = require('../config/config.js');
 
+// check list accessibility
+module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM lists, users WHERE lists.list_id = ? AND lists.group_id = users.group_id AND users.group_id = ? AND users.user_id = ?",
+        params: [list_id, group_id, user_id],
+        single: true
+    });
+}
+
+// check admin privilege for list
+module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id" +
+            "AND academgroups.group_id = ? AND academgroups.group_admin = ?",
+        params: [list_id, group_id, user_id],
+        single: true
+    });
+}
+
 // getting all lists
 module.exports.getAllLists = () => {
     return executor.execute({

@@ -16,11 +16,11 @@ const checkContents = ({ group_name, course }) => {
     }
     let pass = true;
     
-    if (!contents.group_name) {
+    if (!group_name) {
         errors.group_name = 'Group name is empty';
         pass = false;
     }
-    if (isNaN(parseInt(contents.course))){
+    if (isNaN(parseInt(course))){
         errors.course = 'Course is not a number';
         pass = false;
     }
@@ -59,18 +59,19 @@ const checkMatch = async({ faculty_id, program_id }) => {
 // GET-request for showing group info
 module.exports.groupInfo_get = async (req, res) => {
     try {
-        let group_id = parseInt(req.params.id);
+        let group_id = parseInt(req.params.groupid);
         if (isNaN(group_id)){
             throw new Error("Group id is not a number");
         }
         if (!await groupModel.getGroupById({ group_id: group_id })){
             throw new Error("Group with given id not found");
         }
+        console.log(req.user);
         if (req.user.group_id !== group_id){
             throw new Error("Access denied: not a member");
         }
 
-        let groupInfo = await groupModel.getGroupInfoById({ group_id: req.params.group_id });
+        let groupInfo = await groupModel.getGroupInfoById({ group_id: req.params.groupid });
         res.status(200).json({ 
             group_name: groupInfo.group_name, 
             faculty_name: groupInfo.faculty_name,
@@ -161,13 +162,13 @@ module.exports.editGroup_post = async (req, res) => {
             throw new Error(`${ content.errors.group_name ? content.errors.group_name : content.errors.course }`);
         }
 
-        let admin_id = await groupModel.getGroupAdmin({ group_id: req.params.group_id });
-        if (req.user.user_id !== admin_id) {
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.params.groupid });
+        if (req.user.user_id !== admin_id.group_admin) {
             throw new Error("Access denied: not group admin");
         }
 
         await groupModel.editGroup({
-            group_id: req.body.group_id,
+            group_id: req.params.groupid,
             group_name: req.body.group_name,
             course: req.body.course
         });
@@ -180,7 +181,7 @@ module.exports.editGroup_post = async (req, res) => {
 // generate new token as invitation group; must return link
 module.exports.generateInvitation_get = async (req, res) => {
     try {
-        let admin_id = await groupModel.getGroupAdmin({ group_id: req.params.group_id });
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.params.groupid });
         if (req.user.user_id !== admin_id) {
             throw new Error("Access denied: not group admin");
         }

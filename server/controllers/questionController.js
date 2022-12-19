@@ -31,18 +31,49 @@ const checkContents = (contents) => {
     return { pass, errors };
 }
 
-// GET-request for creating question
-module.exports.createQuestion_get = (req, res) => {
-    
+// GET-request for getting all questions from list
+module.exports.getAllQuestions_get = async (req, res) => {
+    try {
+        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
+            throw new Error ("Access denied: no membership to view questions");
+        }
+
+        let questions = await questionModel.getAllQuestionsByListId({ list_id: req.params.listid });
+        res.status(200).json(questions);
+    } catch (error) {
+        errorHandler({ res: res, code: 403, error: error.message });
+    }
+}
+
+// GET-request for getting info about one specific question
+module.exports.getQuestion_get = async (req, res) => {
+    try {
+        // check access to list
+        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
+            throw new Error ("Access denied: no membership to view question");
+        }
+
+        let question = await questionModel.getQuestionById({ question_id: req.params.questionid });
+        if (!question) {
+            throw new Error ("Couldn't get question: question doesn't belong to given list");
+        }
+
+        res.status(200).json(question);
+    } catch (error) {
+        errorHandler({ res: res, code: 500, error: error.message });
+    }
 }
 
 // POST-request for creating question
 module.exports.createQuestion_post = async (req, res) => {
-    // various checks required I guess
     try {
+        // check user access
+        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
+            throw new Error ("Access denied: no membership to view questions");
+        }
         // check whether question with such order exists
         let orderCheck = await questionModel.checkOrder({
-            listId: req.body.list_id,
+            listId: req.params.listid,
             order: req.body.order
         });
         if (orderCheck) {
@@ -74,7 +105,7 @@ module.exports.createQuestion_post = async (req, res) => {
                 // insert new row into question table
                 await questionModel.createQuestion({ 
                     connection: connection, 
-                    listId: req.body.list_id,
+                    listId: req.params.listid,
                     userId: req.user.id, 
                     date: date, 
                     order: req.body.order,
@@ -87,7 +118,7 @@ module.exports.createQuestion_post = async (req, res) => {
                 await questionModel.createVersion({ 
                     connection: connection, 
                     date: date, 
-                    listId: req.body.list_id,
+                    listId: req.params.listid,
                     userId: req.user.id, 
                     questId: quest_id, 
                     title: req.body.title, 
@@ -107,25 +138,24 @@ module.exports.createQuestion_post = async (req, res) => {
                 throw new Error('Cannot create new question');
             }
     } catch (error) {
-        errorHandler(res, { message: error.message });
+        errorHandler({ res: res, code: 500, error: error.message });
     };
 
     // if there were no error, redirect
     res.status(200).json();
 }
 
-// GET-request for editing question
-module.exports.editQuestion_get = (req, res) => {
-
-}
-
 // POST-request for editing question
 module.exports.editQuestion_post = async (req, res) => {
     try {
+        // check user access
+        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
+            throw new Error ("Access denied: no membership to view questions");
+        }
         // check whether question with passed id exits in database
         let checkExistence = await questionModel.checkInDatabase({
-            questId: req.body.question_id,
-            listId: req.body.list_id
+            questId: req.params.questionid,
+            listId: req.params.listid
         });
         if (!checkExistence){
             res.status(204).json({ success: true, message: 'Question with such id not found' });
@@ -134,7 +164,7 @@ module.exports.editQuestion_post = async (req, res) => {
 
         // check whether question with such order exists
         let orderCheck = await questionModel.checkOrder({
-            listId: req.body.list_id,
+            listId: req.params.listid,
             order: req.body.order
         });
         if (orderCheck) {
@@ -149,7 +179,7 @@ module.exports.editQuestion_post = async (req, res) => {
             return;
         }
 
-        // try to establish connection + make tran
+        // try to establish connection + make transaction
         let connection = undefined;
 
             try {
@@ -166,12 +196,12 @@ module.exports.editQuestion_post = async (req, res) => {
                 // lock record's editing for other connections in question table
                 await questionModel.selectQuestionForUpdate({
                     connection: connection,
-                    questId: req.body.question_id
+                    questId: req.params.questionid
                 });
 
                 await questionModel.updateQuestion({
                     connection: connection,
-                    questId: req.body.question_id,
+                    questId: req.params.questionid,
                     date: date,
                     order: req.body.order,
                     title: req.body.title,
@@ -182,9 +212,9 @@ module.exports.editQuestion_post = async (req, res) => {
                 await questionModel.createVersion({ 
                     connection: connection, 
                     date: date, 
-                    listId: req.body.list_id,
+                    listId: req.params.listid,
                     userId: req.user.id, 
-                    questId: req.body.question_id, 
+                    questId: req.params.questionid, 
                     title: req.body.title, 
                     body: req.body.body
                 });
@@ -200,7 +230,7 @@ module.exports.editQuestion_post = async (req, res) => {
                 throw new Error('Cannot update question');
             }
     } catch (error) {
-        errorHandler(res, { message: error.message });
+        errorHandler({ res: res, code: 500, message: error.message });
     };
 
     // if there were no errors, redirect
@@ -210,10 +240,14 @@ module.exports.editQuestion_post = async (req, res) => {
 // DELETE-request for deleting question
 module.exports.deleteQuestion_delete = async (req, res) => {
     try {
+        // check user access
+        if (!await listModel.checkListPrivilege({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
+            throw new Error ("Access denied: no membership to view questions");
+        }
         // check whether requested record belongs to the list 
         let checkExistence = await questionModel.checkInDatabase({
-            questId: req.body.question_id,
-            listId: req.body.list_id
+            questId: req.params.questionid,
+            listId: req.params.listid
         });
         if (!checkExistence){
             res.status(204).json({ success: true, message: 'Question with such id not found' });
@@ -234,14 +268,14 @@ module.exports.deleteQuestion_delete = async (req, res) => {
                 // lock record's editing for other connections in question table
                 await questionModel.selectQuestionForUpdate({
                     connection: connection,
-                    questId: req.body.question_id
+                    questId: req.params.questionid
                 });
 
                 // mark record as deleted
                 await questionModel.markDeleted({
                     connection: connection,
-                    listId: req.body.list_id,
-                    questId: req.body.question_id
+                    listId: req.params.listid,
+                    questId: req.params.questionid
                 })
 
                 // the end of transaction: commit changes and release connection
@@ -255,7 +289,7 @@ module.exports.deleteQuestion_delete = async (req, res) => {
                 throw new Error('Cannot delete question');
             }
     } catch (error) {
-        errorHandler(res, { message: error.message });
+        errorHandler({ res: res, code: 500, message: error.message });
     }
 }
 
@@ -281,7 +315,7 @@ module.exports.changeOrder_post = async (req, res) => {
             throw new Error('Reordering list contains repeating values');
         }
         // check if orders' length matches list's length
-        if (ids.length !== await listModel.getListLengthById({listId: req.body.list_id })){
+        if (ids.length !== await listModel.getListLengthById({listId: req.params.listid })){
             throw new Error('Requested arrays size does not match lists size');
         }
 
@@ -299,10 +333,10 @@ module.exports.changeOrder_post = async (req, res) => {
 
             for(let i = 0; i < id.length; i++){
                 // check whether question with such id belongs to that list; if yes then update order
-                if (await questionModel.checkInDatabase({ questId: ids[i], listId: req.body.list_id })){
+                if (await questionModel.checkInDatabase({ questId: ids[i], listId: req.params.listid })){
                     await questionModel.updateOrder({
                         connection: connection,
-                        listId: req.body.list_id,
+                        listId: req.params.listid,
                         questId: ids[i],
                         order: newOrders[i]
                     });
@@ -322,35 +356,19 @@ module.exports.changeOrder_post = async (req, res) => {
             throw new Error('Cannot update question order');
         }
     } catch (error) {
-        errorHandler(res, { message: error.message });
-    }
-}
-
-module.exports.showVersions_get = async (req, res) => {
-    try {
-        if (!await userModel.checkPrivilege({ user_id: req.user.user_id })) {
-            throw new Error ("Access denied: no privilege to preview versions");
-        }
-
-        let versions = await questionModel.getVersionsByQuestionId({ questId: req.body.question_id });
-        res.status(200).json(versions);
-    } catch (error) {
         errorHandler({ res: res, code: 500, error: error.message });
     }
 }
 
-// check whether question with a given order is present in the list
-// const isOccupied = async(res, req) => {
+// module.exports.showVersions_get = async (req, res) => {
 //     try {
-//         let orderCheck = await question.checkOrder(req.body.list_id, req.body.order);
-
-//         if (orderCheck) {
-//             return true;
+//         if (!await userModel.checkPrivilege({ group_id: req.body.group_id, user_id: req.user.user_id })) {
+//             throw new Error ("Access denied: no privilege to preview versions");
 //         }
+
+//         let versions = await questionModel.getVersionsByQuestionId({ questId: req.params.questionid });
+//         res.status(200).json(versions);
 //     } catch (error) {
-//         console.error(error);
-//         throw new Error('Cannot check order');
-//     };
-    
-//     return false;
+//         errorHandler({ res: res, code: 500, error: error.message });
+//     }
 // }

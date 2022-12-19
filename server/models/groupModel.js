@@ -56,8 +56,8 @@ module.exports.getGroupById = ({ group_id }) => {
 module.exports.getGroupInfoById = ({ group_id }) => {
     return executor.execute({
         query:
-            "SELECT * FROM academgroups, faculty, program" +
-            "WHERE group_id = ? AND academgroups.faculty_id = faculty.faculty_id AND academgroups.program_id = program.program_id",
+            "SELECT * FROM academgroups " +
+            "WHERE group_id = ?",
         params: [group_id],
         single: true
     });
@@ -70,5 +70,35 @@ module.exports.getGroupAdmin = ({ group_id }) => {
             "SELECT group_admin FROM academgroups WHERE group_id = ?",
         params: [group_id],
         single: true
+    });
+}
+
+// check whether user is a group admin
+module.exports.checkPrivilege = ({ group_id, user_id }) => {
+    return executor.execute({
+        query:
+            "SELECT COUNT(*) FROM academgroups WHERE group_admin = ? AND group_id = ?",
+        params: [user_id, group_id],
+        single: true
+    });
+}
+
+// check whether user is a group member
+module.exports.checkMembership = ({ group_id, user_id }) => {
+    return executor.execute({
+        query:
+            "SELECT COUNT(*) FROM users WHERE user_id = ? AND group_id = ?",
+        params: [user_id, group_id],
+        single: true
+    });
+}
+
+// get users by group
+module.exports.getAllGroupMembers = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM users WHERE group_id = ?",
+        params: [group_id],
+        single: false
     });
 }

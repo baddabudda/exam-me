@@ -2,10 +2,12 @@
 const express = require('express');
 const router = express.Router();
 // local dependencies
-const profileController = require('../controllers/profileController.js');
+const userController = require('../controllers/userController.js');
 const authHandler = require('../utils/authHandler.js');
 
-router.get('/', authHandler, profileController.profile_get);
-router.post('/edit', authHandler, profileController.editProfile_post);
+// exam.me/prfoile/
+router.get('/', authHandler, userController.profile_get);
+// exam.me/profile/edits
+router.post('/edit', authHandler, userController.editProfile_post);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const executor = require('./executor.js');
 
 // === QUESTION - LISTS requests ===
-module.exports.getQuestionsByListId = ({ listId }) => {
+module.exports.getAllQuestionsByListId = ({ listId }) => {
     return executor.execute({
         query:
             "SELECT * FROM question WHERE list_id = ?",
@@ -77,6 +77,15 @@ module.exports.markDeleted = ({ connection, listId, questId }) => {
         query:
             "UPDATE question SET is_deleted = 1 WHERE list_id = ? AND question_id = ?",
         params: [listId, questId],
+        single: true
+    });
+}
+
+module.exports.getQuestionById = ({ question_id, list_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM question WHERE question_id = ? AND list_id = ?",
+        params: [question_id, list_id],
         single: true
     });
 }
