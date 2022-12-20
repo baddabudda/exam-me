@@ -1,5 +1,5 @@
 // library dependencies
-const pool = require('../config/config.js');
+const { pool } = require('../config/config.js');
 // local dependencies
 const questionModel = require('../models/questionModel.js');
 const listModel = require('../models/listModel.js');
@@ -8,6 +8,7 @@ const errorHandler = require('../utils/errorHandler.js');
 
 // check contents from form
 const checkContents = (contents) => {
+    // console.log(contents);
     let errors = {
         order: undefined,
         title: undefined,
@@ -15,7 +16,7 @@ const checkContents = (contents) => {
     };
     let pass = true;
 
-    if (isNan(parseInt(contents.order))){
+    if (isNaN(parseInt(contents.order))){
         errors.order = 'Enter correct value!';
         pass = false;
     }
@@ -69,15 +70,17 @@ module.exports.createQuestion_post = async (req, res) => {
     try {
         // check user access
         if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
-            throw new Error ("Access denied: no membership to view questions");
+            throw new Error ("Access denied: no membership to add question");
         }
         // check whether question with such order exists
         let orderCheck = await questionModel.checkOrder({
             listId: req.params.listid,
             order: req.body.order
         });
+        console.log(orderCheck);
         if (orderCheck) {
             res.status(204).json({ success: true, message: 'Question with such order already exists' });
+            // throw new Error ("Question with such order already exists");
             return;
         }
         // check contents of question: order, title, body whether they are not empty and order is number
@@ -94,32 +97,35 @@ module.exports.createQuestion_post = async (req, res) => {
                 connection = await pool.promise().getConnection();
                 // if we have connection, then make queries
                 // set isolation level and begin transaction
-                await connection.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
+                await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
                 await connection.beginTransaction();
 
                 // lock tables: WRITE = only current connection can read & write data to (question, versioned) tables
-                await connection.execute("LOCK TABLES question WRITE, versioned WRITE");
+                await connection.query("LOCK TABLES question WRITE, versioned WRITE");
 
                 // make queries
-                let date = Date.now() / 1000;
+                let timeElapsed = Date.now();
+                let date = new Date(timeElapsed);
+                console.log(date.toISOString().slice(0, 19));
                 // insert new row into question table
                 await questionModel.createQuestion({ 
                     connection: connection, 
                     listId: req.params.listid,
-                    userId: req.user.id, 
+                    userId: req.user.user_id, 
                     date: date, 
                     order: req.body.order,
                     title: req.body.title, 
                     body: req.body.body 
                 });
                 // get id of recently created question (for that connection)
-                let quest_id = await connection.execute("SELECT LAST_INSERT_ID()");
+                let [rows, fields] = await connection.query("SELECT last_insert_id()");
+                let quest_id = Object.values(rows[0])[0];
                 // insert new version into versioned table
                 await questionModel.createVersion({ 
                     connection: connection, 
                     date: date, 
                     listId: req.params.listid,
-                    userId: req.user.id, 
+                    userId: req.user.user_id, 
                     questId: quest_id, 
                     title: req.body.title, 
                     body: req.body.body
@@ -150,7 +156,7 @@ module.exports.editQuestion_post = async (req, res) => {
     try {
         // check user access
         if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
-            throw new Error ("Access denied: no membership to view questions");
+            throw new Error ("Access denied: no membership to edit question");
         }
         // check whether question with passed id exits in database
         let checkExistence = await questionModel.checkInDatabase({
@@ -167,15 +173,19 @@ module.exports.editQuestion_post = async (req, res) => {
             listId: req.params.listid,
             order: req.body.order
         });
-        if (orderCheck) {
+        // console.log(orderCheck.question_id);
+        // console.log(req.params.questionid);
+        // console.log(orderCheck.question_id == req.params.questionid);
+        if (orderCheck && orderCheck.question_id !== parseInt(req.params.questionid)) {
+            console.log('Question with such order already exists');
             res.status(204).json({ success: true, message: 'Question with such order already exists' });
             return;
         }
 
         // check contents of question: order, title, body whether they are not empty and order is number
-        let checkContents = checkContents(req.body);
-        if (!checkContents.pass) {
-            res.status(204).json({ success: true, message: checkContents.errors });
+        let checkContent = checkContents(req.body);
+        if (!checkContent.pass) {
+            res.status(204).json({ success: true, message: checkContent.errors });
             return;
         }
 
@@ -187,11 +197,13 @@ module.exports.editQuestion_post = async (req, res) => {
                 connection = await pool.promise().getConnection();
                 // if we have connection, then make queries
                 // set isolation level and begin transaction
-                await connection.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
+                await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
                 await connection.beginTransaction();
 
                 // make queries
-                let date = Date.now() / 1000;
+                let timeElapsed = Date.now();
+                let date = new Date(timeElapsed);
+                // console.log(date.toISOString().slice(0, 19));
 
                 // lock record's editing for other connections in question table
                 await questionModel.selectQuestionForUpdate({
@@ -201,6 +213,7 @@ module.exports.editQuestion_post = async (req, res) => {
 
                 await questionModel.updateQuestion({
                     connection: connection,
+                    user_id: req.user.user_id,
                     questId: req.params.questionid,
                     date: date,
                     order: req.body.order,
@@ -213,7 +226,7 @@ module.exports.editQuestion_post = async (req, res) => {
                     connection: connection, 
                     date: date, 
                     listId: req.params.listid,
-                    userId: req.user.id, 
+                    userId: req.user.user_id, 
                     questId: req.params.questionid, 
                     title: req.body.title, 
                     body: req.body.body
@@ -230,6 +243,7 @@ module.exports.editQuestion_post = async (req, res) => {
                 throw new Error('Cannot update question');
             }
     } catch (error) {
+        console.error(error.message);
         errorHandler({ res: res, code: 500, message: error.message });
     };
 
@@ -242,7 +256,7 @@ module.exports.deleteQuestion_delete = async (req, res) => {
     try {
         // check user access
         if (!await listModel.checkListPrivilege({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.listid })) {
-            throw new Error ("Access denied: no membership to view questions");
+            throw new Error ("Access denied: no admin to delete question");
         }
         // check whether requested record belongs to the list 
         let checkExistence = await questionModel.checkInDatabase({
@@ -262,7 +276,7 @@ module.exports.deleteQuestion_delete = async (req, res) => {
                 connection = await pool.promise().getConnection();
                 // if we have connection, then make queries
                 // set isolation level and begin transaction
-                await connection.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
+                await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
                 await connection.beginTransaction();
 
                 // lock record's editing for other connections in question table
@@ -280,6 +294,7 @@ module.exports.deleteQuestion_delete = async (req, res) => {
 
                 // the end of transaction: commit changes and release connection
                 await connection.commit();
+                console.log('commited');
                 pool.releaseConnection(connection);
             } catch (error) {
                 // cancel transaction results and release connection

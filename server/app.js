@@ -13,7 +13,7 @@ const authRoutes = require('./routes/authRouter.js');
 const groupRoutes = require('./routes/groupRouter.js');
 const singleRoutes = require('./routes/singleRouters.js');
 const profileRoutes = require('./routes/profileRouter.js');
-const questionRoutes = require('./routes/questionRouter.js');
+const listRoutes = require('./routes/listRouter.js');
 const passportSetup = require('./config/passport-setup.js');
 
 // === DOTENV CONFIG ===
@@ -26,10 +26,10 @@ app.listen(3000);
 // === MIDDLEWARE ===
 // --- getting info about queries ---
 app.use(morgan('dev'));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // --- for parsing .json files ---
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // --- parse cookies and sessions ---
@@ -49,4 +49,4 @@ app.use(singleRoutes);
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
 app.use('/group', groupRoutes);
-app.use('/list', questionRoutes);
+app.use('/list', listRoutes);

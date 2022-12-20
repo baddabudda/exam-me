@@ -26,7 +26,7 @@ module.exports.createUser = ({ vk_id, fname, lname }) => {
     return executor.execute({
         query:
             "INSERT INTO users (vk_id, user_fname, user_lname, status) " +
-            "VALUES (?, ?, ?, ?, ?, 0)",
+            "VALUES (?, ?, ?, 0)",
         params: [vk_id, fname, lname],
         single: true
     });
@@ -53,8 +53,9 @@ module.exports.changeStatus = ({ user_id }) => {
 }
 
 // join group
-module.exports.joinGroup = ({ user_id, group_id }) => {
+module.exports.joinGroup = ({ connection, user_id, group_id }) => {
     return executor.execute({
+        connection: connection,
         query:
             "UPDATE users SET group_id = ? WHERE user_id = ?",
         params: [group_id, user_id],

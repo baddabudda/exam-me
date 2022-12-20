@@ -2,7 +2,7 @@ const { pool } = require('../config/config.js');
 
 // universal query function: both types of connections acceptable
 module.exports.execute = ({ connection, query, params, single}) => {
-    console.log(query);
+    // console.log(connection);
     // if outer connection isn't declared
     if (typeof connection === 'undefined') {
         return new Promise(async (resolve, reject) => {
@@ -26,7 +26,8 @@ module.exports.execute = ({ connection, query, params, single}) => {
             resolve(single ? result[0][0] : result[0]);
         } catch (error) {
             console.error(error);
-            reject(new Error('Query cannot be executed'));
+            // reject(new Error('Query cannot be executed'));
+            reject(error);
         };
     });   
 }

@@ -12,7 +12,7 @@ module.exports.getPublicBySubjectId = async (req, res) => {
 };
 
 
-module.exports.getListById = async (req, res) => {
+module.exports.getListById_get = async (req, res) => {
     try{
         if (!isNan(parseInt(req.params.list_id))){
             const currentList = await list.getById(req.params.list_id);
