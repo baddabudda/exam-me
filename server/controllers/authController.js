@@ -1,24 +1,22 @@
 const userModel = require('../models/userModel.js');
 const passport = require('passport');
 
-// GET-method for log in
-module.exports.signIn_get = (req, res) => {
-
-}
-
 // redirect after authotization
 module.exports.redirect = (req, res) => {
-    if (req.user){
-        // if user is authorized, then redirect him somewhere: home page, for example
-        res.status(200).json({ success: true, message: "Authorized successfully" });
+    if (req.user.status){
+        // if 1 = not registrational authorization
+        res.status(200).json({ success: true, message: "Authorized successfully; return to the page", user: req.user });
+    } else if (!req.user.status) {
+        // if 0 = registrational authorization
+        res.redirect('/profile/');
+        // res.status(200).json({ success: true, message: "Authorized successfully; redirect profile page", user: req.user });
     } else {
-        // otherwise authorization fails, then redirect user somewhere: login page, for example
         res.status(401).json({ success: false, message: "Authorization failed" });
     }
 }
 
-// sign out
-module.exports.signOut = (req, res) => {
+// log out
+module.exports.logOut = (req, res) => {
     if (req.user){
         // destroy req.user (is it necessary tho?)
         req.logOut();

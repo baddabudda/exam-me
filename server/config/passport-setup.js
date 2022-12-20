@@ -7,16 +7,16 @@ const userModel = require('../models/userModel.js');
 // === (DE)SERIALIATION ===
 // which data of user must be stored in the session
 passport.serializeUser((user, done) => {
-    console.log('serializing')
+    // console.log('serializing');
     done(null, user.user_id);
  });
  
  // attaches user object to req.user
- passport.deserializeUser((db_id, done) => {
-    console.log(db_id)
-    userModel.getUserById({ db_id: db_id })
+ passport.deserializeUser((id, done) => {
+    // console.log(db_id);
+    userModel.getUserById({ user_id: id })
     .then(currentUser => {
-        console.log(currentUser);
+        // console.log(currentUser);
         done(null, currentUser);
     }).
     catch (err => {
@@ -46,6 +46,7 @@ passport.serializeUser((user, done) => {
 
                 user = await userModel.getUserByVkId({ vk_id: profile._json.id });
             }
+
             // pass user during authorization
             done(null, user);
          }
