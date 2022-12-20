@@ -15,6 +15,10 @@
       {
         "name": "subjects",
         "description": "API for subjects"
+      },
+      {
+        "name": "lists",
+        "description": "API for lists"
       }
     ],
     "schemes": ["http"],
@@ -139,6 +143,54 @@
 
             }
 
+        },
+        "/lists/public/{subject_id}":{
+            "get": {
+                "tags": ["lists"],
+                "summary": "Get all public lists by subject_id",
+                "parameters": [{
+                    "name": "subject_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "id of subject",
+                    "type": "integer"
+                }],
+
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Lists"
+                        }
+                    },
+                    "500": {"message": "could not find subject!"},
+                    "400": {"message": "list_id is not a number!"}
+                }
+            }
+        },
+        "/lists/{list_id}": {
+            "get": {
+                "tags": ["lists"],
+                "summary": "Get list by list_id",
+                "parameters": [{
+                    "name": "list_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "id of list, which is needed to find",
+                    "type": "integer"
+                }],
+
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/List"
+                        }
+                    },
+                    "500": {"message": "could not find subject!"},
+                    "400": {"message": "list_id is not a number!"}
+                }
+            }
         }
 
     },
@@ -170,6 +222,77 @@
                     "uniqueItems": true
                 }
             }    
+        },
+        "List": {
+            "required": ["list_name", "group_id", "subject_id", "is_public", "semester"],
+            "properties": {
+                "list_id": {
+                    "type": "integer",
+                    "uniqueItems": true
+                },
+                "list_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "group_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "subject_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "subject_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "is_public":{
+                    "type": "boolean",
+                    "uniqueItems": false
+                },
+                "semester":{
+                    "type": "integer",
+                    "uniqueItems": false
+                }
+
+
+            }
+        },
+        "List_DTO": {
+            "required": ["list_name", "group_id", "subject_id", "is_public", "semester"],
+            "properties": {
+                "list_id": {
+                    "type": "integer",
+                    "uniqueItems": true
+                },
+                "list_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "group_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "subject_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "is_public":{
+                    "type": "boolean",
+                    "uniqueItems": false
+                },
+                "semester":{
+                    "type": "integer",
+                    "uniqueItems": false
+                }
+
+
+            }},
+        "Lists": {
+            "type": "array",
+            "items":{ 
+                "$ref": "#/definitions/List"
+            }
         }
     }
 }
