@@ -33,15 +33,19 @@ module.exports.profile_get = async (req, res) => {
     }
 }
 
-module.exports.editProfile_post = async (req, res) => {
+
+
+module.exports.editProfile_put = async (req, res) => {
     try {
         try {
             await userModel.editUser({
                 user_id: req.user.user_id,
-                fname: req.user.user_fname,
-                lname: req.user.user_lname,
-                pname: req.user.user_pname
+                fname: req.body.user_fname || req.user.user_fname,
+                lname: req.body.user_lname || req.user.user_lname,
+                pname: req.body.user_pname || req.user.user_pname
             });
+
+            res.status(200).json({success: true, message: 'User update is successful'})
         } catch (error) {
             throw new Error('Cannot update profile info');
         }

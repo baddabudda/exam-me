@@ -45,14 +45,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // --- enable cors ---
-app.use(cors());
+app.use(cors({origin: process.env.UI_HOST, credentials: true}));
 
 // --- routing ---
 app.use('/api', singleRoutes);
 app.use('/auth', authRoutes);
 
-app.get('/', (res, req) => {
-    req.send("Hello, world!")
+app.get('/', (req, res) => {
+    res.send("Hello, world!")
 })
 
 app.listen(PORT, () => console.log(`Exam Me backend is working...`));

@@ -151,7 +151,7 @@ module.exports.createGroup_post = async (req, res) => {
     }
 }
 
-module.exports.editGroup_post = async (req, res) => {
+module.exports.editGroup_put = async (req, res) => {
     try {
         let content = checkContents({
             group_name: req.body.group_name,

@@ -1,4 +1,3 @@
-const passport = require('passport');
 
 // middleware to check authorization for routes
 module.exports = (req, res, next) => {

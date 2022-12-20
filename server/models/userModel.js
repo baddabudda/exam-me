@@ -26,7 +26,7 @@ module.exports.createUser = ({ vk_id, fname, lname }) => {
     return executor.execute({
         query:
             "INSERT INTO users (vk_id, user_fname, user_lname, status) " +
-            "VALUES (?, ?, ?, ?, ?, 0)",
+            "VALUE (?, ?, ?, 0)",
         params: [vk_id, fname, lname],
         single: true
     });

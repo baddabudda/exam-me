@@ -10,7 +10,7 @@ router.get('/:groupid', authHandler, groupController.groupInfo_get);
 // exam.me/group/create
 router.post('/create', authHandler, groupController.createGroup_post);
 // exam.me/group/123/edit
-router.post('/:groupid/edit', authHandler, groupController.editGroup_post);
+router.put('/:groupid/edit', authHandler, groupController.editGroup_put);
 // exam.me/group/123/invite
 router.get('/:groupid/invite', authHandler, groupController.generateInvitation_get);
 

@@ -46,9 +46,10 @@ passport.serializeUser((user, done) => {
 
                 user = await userModel.getUserByVkId({ vk_id: profile._json.id });
             }
+            // console.log(user);
 
             // pass user during authorization
             done(null, user);
          }
      )
- );
+ ); 
