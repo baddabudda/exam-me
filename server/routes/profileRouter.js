@@ -10,5 +10,4 @@ router.get('/', authHandler, userController.profile_get);
 // exam.me/profile/edits
 router.post('/edit', authHandler, userController.editProfile_post);
 
-
 module.exports = router;

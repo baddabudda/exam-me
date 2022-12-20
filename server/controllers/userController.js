@@ -13,8 +13,7 @@ const verifyToken = (token) => {
     };
 
     try {
-        let tmp = jwt.verify(token, keys.webtoken.tokenKey, { complete: true});
-        result.group_id = tmp.payload.group_id;
+        result.group_id = jwt.verify(token, keys.webtoken.tokenKey).group_id;
         return result;
     } catch (error) {
         result.pass = false;
@@ -23,7 +22,6 @@ const verifyToken = (token) => {
 }
 
 module.exports.profile_get = async (req, res) => {
-    console.log('profile');
     if (req.user) {
         if (!req.user.status) {
             // console.log('here!');
@@ -40,11 +38,10 @@ module.exports.editProfile_post = async (req, res) => {
         try {
             await userModel.editUser({
                 user_id: req.user.user_id,
-                fname: req.body.fname,
-                lname: req.body.lname,
-                pname: req.body.pname
+                fname: req.user.user_fname,
+                lname: req.user.user_lname,
+                pname: req.user.user_pname
             });
-            // res.status(200).json("cool");
         } catch (error) {
             throw new Error('Cannot update profile info');
         }
@@ -56,8 +53,7 @@ module.exports.editProfile_post = async (req, res) => {
 module.exports.joinGroup_post = async (req, res) => {
     try {
         // verify token and check whether such group exists
-        let verified = verifyToken(req.params.token);
-        console.log(verified);
+        let verified = verifyToken(res.query.token);
 
         if (!verified.pass) {
             throw new Error('Access token has expired');
@@ -68,7 +64,7 @@ module.exports.joinGroup_post = async (req, res) => {
         }
 
         if (req.user.group_id === verified.group_id) {
-            res.status(200).json("Redirecting to group page");
+            // just redirect to group page
         } else if (req.user.group_id) {
             throw new Error('User is a member of another group already');
         } else {

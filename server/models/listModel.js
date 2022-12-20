@@ -16,7 +16,7 @@ module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
 module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
     return executor.execute({
         query:
-            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id " +
+            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id" +
             "AND academgroups.group_id = ? AND academgroups.group_admin = ?",
         params: [list_id, group_id, user_id],
         single: true

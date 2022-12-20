@@ -1,9 +1,8 @@
 const executor = require('./executor.js');
 
 // create group
-module.exports.createGroup = ({ connection, faculty_id, program_id, admin_id, group_name, course }) => {
+module.exports.createGroup = ({ faculty_id, program_id, admin_id, group_name, course }) => {
     return executor.execute({
-        connection: connection,
         query:
             "INSERT INTO academgroups (faculty_id, program_id, group_admin, " +
             "group_name, course, is_closed) " +
