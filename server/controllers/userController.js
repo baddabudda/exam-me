@@ -13,8 +13,8 @@ const verifyToken = (token) => {
     };
 
     try {
-        result.group_id = jwt.verify(token, keys.webtoken.tokenKey).group_id;
-        return result;
+        let tmp = jwt.verify(token, keys.webtoken.tokenKey, { complete: true});
+        result.group_id = tmp.payload.group_id;
     } catch (error) {
         result.pass = false;
         return result;
@@ -32,8 +32,6 @@ module.exports.profile_get = async (req, res) => {
         res.status(401).json({ success: false, message: "Authorization required, redirect" });
     }
 }
-
-
 
 module.exports.editProfile_put = async (req, res) => {
     try {
@@ -68,7 +66,7 @@ module.exports.joinGroup_post = async (req, res) => {
         }
 
         if (req.user.group_id === verified.group_id) {
-            // just redirect to group page
+            res.status(200).json("Redirecting to group page");
         } else if (req.user.group_id) {
             throw new Error('User is a member of another group already');
         } else {

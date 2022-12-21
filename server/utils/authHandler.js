@@ -1,4 +1,3 @@
-
 // middleware to check authorization for routes
 module.exports = (req, res, next) => {
     if (!req.isAuthenticated()) {

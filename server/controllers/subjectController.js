@@ -41,11 +41,11 @@ module.exports.deleteSubjectById = async (req, res) => {
             res.status(200).json( subj_delete );}
         else{
             throw {code: 500, message: 'could not delete subject!'};} 
-
-        }catch (error) {
+        } catch (error) {
             console.log(error);
             errorHandler(res, error);
-            return;}
+            return;
+        }
     
 }
 

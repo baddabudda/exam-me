@@ -8,6 +8,6 @@ const authHandler = require('../utils/authHandler.js');
 // exam.me/prfoile/
 router.get('/', authHandler, userController.profile_get);
 // exam.me/profile/edits
-router.put('/edit', authHandler, userController.editProfile_put);
+router.post('/edit', authHandler, userController.editProfile_put);
 
 module.exports = router;

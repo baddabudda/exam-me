@@ -10,9 +10,11 @@ const cors = require('cors')
 // --- Configuration, etc. ---
 const keys = require('./config/keys.js');
 // --- routing ---
-const singleRoutes = require('./routes/singleRouters.js');
 const authRoutes = require('./routes/authRouter.js');
-//const profileRoutes = require('./routes/profileRouter.js');
+const groupRoutes = require('./routes/groupRouter.js');
+const singleRoutes = require('./routes/singleRouters.js');
+const profileRoutes = require('./routes/profileRouter.js');
+const questionRoutes = require('./routes/questionRouter.js');
 const passportSetup = require('./config/passport-setup.js');
 
 // === DOTENV CONFIG ===

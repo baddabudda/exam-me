@@ -1,4 +1,4 @@
-// This file contains small routes
+// library dependencies
 const express = require('express');
 const router = express.Router();
 const listRouter = require('./listRouter');
