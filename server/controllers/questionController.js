@@ -99,13 +99,12 @@ module.exports.createQuestion_post = async (req, res) => {
             res.status(204).json({ success: true, message: 'Question with such order already exists' });
             return;
         }
-        console.log('hi')
         // check contents of question: order, title, body whether they are not empty and order is number
-        // let content = checkContents({order: req.body.question_order, title: req.body.question_title , body: req.body.question_body});
-        // if (!content.pass) {
-        //     res.status(204).json({ success: true, message: content.errors });
-        //     return;
-        // }
+        let content = checkContents({order: req.body.question_order, title: req.body.question_title , body: req.body.question_body});
+        if (!content.pass) {
+            res.status(204).json({ success: true, message: content.errors });
+            return;
+        }
         console.log('hi')
         let connection = undefined;
 
@@ -115,11 +114,11 @@ module.exports.createQuestion_post = async (req, res) => {
                 connection = await pool.promise().getConnection();
                 // if we have connection, then make queries
                 // set isolation level and begin transaction
-                // await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
-                // await connection.beginTransaction();
+                await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
+                await connection.beginTransaction();
                 // console.log('hi')
-                // // lock tables: WRITE = only current connection can read & write data to (question, versioned) tables
-                // await connection.query("LOCK TABLES question WRITE, versioned WRITE");
+                // lock tables: WRITE = only current connection can read & write data to (question, versioned) tables
+                await connection.query("LOCK TABLES question WRITE, versioned WRITE");
                 // console.log('hi')
                 // make queries
                 let timeElapsed = Date.now();
