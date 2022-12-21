@@ -8,3 +8,12 @@ module.exports.findFacultyById = ({ faculty_id }) => {
         single: true
     });
 }
+
+module.exports.selectAllFaculties = () => {
+    return executor.execute({
+        query:
+            "SELECT * FROM faculty",
+        params: [],
+        single: false
+    });
+}

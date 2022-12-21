@@ -8,3 +8,18 @@ module.exports.findProgramById = ({ program_id }) => {
         single: true
     });
 }
+
+module.exports.selectAllPrograms = () => {
+    return executor.execute({
+        query:
+            "SELECT * FROM program",
+        params: [],
+        single: false
+    });
+}
+// module.exports.selectProgramByFaculty = ({ faculty_id }) => {
+//     return executor.execute({
+//         query:
+//             "SELECT * FROM program WHERE "
+//     })
+// }

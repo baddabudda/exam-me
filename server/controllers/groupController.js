@@ -86,6 +86,10 @@ module.exports.groupInfo_get = async (req, res) => {
 
 module.exports.createGroup_post = async (req, res) => {
     try {
+        if (req.user.group_id) {
+            throw new Error("User is a member of another group already");
+        }
+
         let content = checkContents({
             group_name: req.body.group_name,
             course: req.body.course
@@ -105,10 +109,6 @@ module.exports.createGroup_post = async (req, res) => {
         }).catch (error => {
             throw new Error("Unexpected error in matching ids");
         })
-
-        if (req.user.group_id) {
-            throw new Error("User is a member of another group already");
-        }
 
         // if no errors, then begin transaction
         let connection = undefined;

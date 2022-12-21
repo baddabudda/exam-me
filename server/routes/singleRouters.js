@@ -7,12 +7,13 @@ const profileRouter = require('./profileRouter')
 const groupRouter = require('./groupRouter');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger.json');
-
+const universityRouters = require('./universityRouters.js');
 
 router.use('/subjects', subjectRouter);
 router.use('/lists', listRouter);
 router.use('/profile', profileRouter);
 router.use('/group', groupRouter);
+router.use('/university', universityRouters);
 
 router.use('/', swaggerUi.serve);
 router.get('/', swaggerUi.setup(swaggerDocument));
