@@ -15,8 +15,11 @@ import { QuestionComponent } from "./components/question/question.component";
 import { AnswerComponent } from "./components/answer/answer.component";
 import { ToolbarComponent } from "./components/toolbar/toolbar.component";
 import { LoginComponent } from "./components/login/login.component";
-import { VkComponent } from "./components/Vk.component";
 import { HttpClientModule } from "@angular/common/http";
+
+import { CookieModule } from 'ngx-cookie';
+import { GroupComponent } from "./components/group/group.component";
+import { ProfileComponent } from "./components/profile/profile.component";
 
 @NgModule({
   declarations: [
@@ -28,7 +31,8 @@ import { HttpClientModule } from "@angular/common/http";
     AnswerComponent,
     ToolbarComponent,
     LoginComponent,
-    VkComponent
+    GroupComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
@@ -41,6 +45,7 @@ import { HttpClientModule } from "@angular/common/http";
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    CookieModule.withOptions()
 ],
   providers: [{provide: TUI_SANITIZER, useClass: NgDompurifySanitizer}],
   bootstrap: [AppComponent]

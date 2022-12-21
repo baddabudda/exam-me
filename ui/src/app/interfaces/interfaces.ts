@@ -24,10 +24,20 @@ export interface question{
     }
 
 export interface user{
-    id: number,
-    name: string,
-    Lastname: string,
-    Fname: string,
+    user_id: number,
+    vk_id: number,
+    user_fname: string,
+    user_lname: string,
+    user_pname: string,
+    status: boolean
     group_id: number,
-    sid: string
+}
+
+export interface Group{
+    group_id: number,
+    faculty_id: number,
+    program_id: number,
+    group_admin: number,
+    group_name: string,
+    course: number,
 }

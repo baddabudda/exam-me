@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Host, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Route, Router } from '@angular/router';
 import { question, user } from 'src/app/interfaces/interfaces';
 import { AuthService } from 'src/app/services/auth.service';
 import { QuestionService } from 'src/app/services/question.service';
 import { Vk_App_Id } from 'src/config';
+import { HOST } from 'src/config';
 
 @Component({
     selector: 'toolbar',
@@ -20,6 +21,7 @@ export class ToolbarComponent implements OnInit {
     questionListOpened = false;
     error: string | null = null;
     user?: user;
+    vk_auth_link: string = `${HOST}/auth/vk`
 
     constructor(
         private router: Router,

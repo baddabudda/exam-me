@@ -6,7 +6,9 @@ import {
     TuiLinkModule, 
     TuiExpandModule, 
     TuiPrimitiveCheckboxModule,
-    TuiErrorModule
+    TuiErrorModule,
+    TuiAlertModule,
+    TuiRootModule
 } from "@taiga-ui/core";
 import {TuiInputModule, TuiIslandModule} from '@taiga-ui/kit';
 import {TuiActiveZoneModule, TuiAutoFocusModule} from '@taiga-ui/cdk';
@@ -81,6 +83,8 @@ import {
     TuiAlignContentModule,
     TuiToolbarModule,
     TuiAutoFocusModule,
-    TuiErrorModule
+    TuiErrorModule,
+    TuiAlertModule,
+    TuiRootModule
 ]})
 export class TaigaModule{}

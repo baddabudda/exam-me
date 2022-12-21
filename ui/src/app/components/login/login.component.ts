@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { user } from 'src/app/interfaces/interfaces';
+import { AuthService } from 'src/app/services/auth.service';
+import {TuiAlertService} from '@taiga-ui/core';
 
 @Component({
     selector: 'selector-name',
@@ -8,32 +12,40 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 
 export class LoginComponent implements OnInit {
-    access_token : string='';
-    expires_in : number=-1;
-    user_id : number=-1;
+    userForm = new FormGroup({
+        fName: new FormControl('', Validators.required),
+        lName: new FormControl('', Validators.required),
+        pName: new FormControl('', Validators.required),
+    })
+
     constructor(
         private route: ActivatedRoute,
-        private router: Router
-        ) {
-        route.fragment.subscribe(frag => {
-            if(!frag){return router.navigate(['/'])}
-            const [access_token, expires_in, user_id] = frag.split('&');
-            let i = access_token.indexOf('=')
-            if (i==-1){return router.navigate(['/'])}
-            this.access_token=access_token.slice(i+1)
-            i = expires_in.indexOf('=')
-            if (i==-1){return router.navigate(['/'])}
-            this.expires_in=Number(expires_in.slice(i+1))
-            i = user_id.indexOf('=')
-            if (i==-1){return router.navigate(['/'])}
-            this.user_id=Number(user_id.slice(i+1))
-            return
-            
+        private router: Router,
+        private auth: AuthService,
+        @Inject(TuiAlertService) private readonly alertService: TuiAlertService
+    ) {
+        auth.currentUser.subscribe(user => {
+            this.userForm.setValue({
+                fName: user?.user_fname || '',
+                lName: user?.user_lname || '',
+                pName: user?.user_pname || ''
+            })
         })
-        // console.log(window.location.hash)
-        // route.queryParams.subscribe(ev=> console.log(ev));
-     }
+    }
+
 
     ngOnInit() {
-     }
+    }
+
+    onSubmit(){
+        const controls = this.userForm.controls;
+        this.auth.editProfile({
+            user_fname: controls.fName.value,
+            user_lname: controls.lName.value,
+            user_pname: controls.pName.value,
+        } as any).subscribe(res => {
+            this.alertService.open('Saved', {autoClose: true}).subscribe();
+            this.router.navigate(['/']);
+        });
+    }
 }

@@ -3,6 +3,7 @@ import { of, throwError } from 'rxjs';
 import { list } from '../interfaces/interfaces';
 import { HttpClient } from '@angular/common/http';
 import { HOST } from 'src/config';
+import { getHttpOptions } from './auth.service';
 
 @Injectable({providedIn: 'root'})
 export class ListService {
@@ -10,12 +11,12 @@ export class ListService {
         private http: HttpClient,
     ) { }
     getLists(subject_id: number){
-        return this.http.get<list[]>(`${HOST}/api/list/public/${subject_id}`)
+        return this.http.get<list[]>(`${HOST}/api/lists/public/${subject_id}`, getHttpOptions())
         // return(of(lists.filter(list=>(list.subject_id==subject_id))))
 
     }
     getList(list_id: number){
-        return this.http.get<list>(`${HOST}/api/list/${list_id}`)
+        return this.http.get<list>(`${HOST}/api/lists/${list_id}`, getHttpOptions())
         // const res = lists.find(list=>(list.id==list_id));
         // return res?of(res):throwError(()=>'not found')
 

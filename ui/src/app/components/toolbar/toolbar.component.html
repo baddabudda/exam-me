@@ -1,19 +1,23 @@
 <div class="tui-container tui-container_fullwidth" *ngIf="!toolbar_hide">
     <div class="tui-row tui-row_adaptive toolbar">
         <span *ngIf="user">
-            <button
+            <a
             tuiButton
             appearance="mono"
-            size='m'> 
+            size='m'
+            routerLink="/profile"
+            > 
                 Мой аккаунт
-            </button>
+            </a>
             <span class="devider"></span>
-            <button
+            <a
             tuiButton
             appearance="mono"
-            size='m'> 
+            size='m'
+            routerLink="/group"
+            > 
                 Моя группа
-            </button>
+            </a>
         </span>
         <span class="spacer"></span>
         <span>
@@ -22,13 +26,13 @@
             tuiButton
             appearance="mono"
             size='m'
-            href='{{getVkOuthLink()}}'> 
+            [href]='vk_auth_link'> 
                 Войти
             </a>
         </span>
         <ng-template #username>
             <span *ngIf="user">
-                {{user.name}} {{user.Lastname}}
+                {{user.user_fname}} {{user.user_lname}}
             </span>
         </ng-template>
     </div>

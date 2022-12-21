@@ -1,7 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { getHttpOptions } from 'src/app/services/auth.service';
 import { QuestionService } from 'src/app/services/question.service';
 import {SubjectService } from 'src/app/services/subject.service';
+import { HOST } from 'src/config';
 import { subject, question } from '../../interfaces/interfaces';
 
 @Component({
@@ -21,7 +24,8 @@ export class WelcomeComponent implements OnInit {
 
     constructor(
         private subjectService : SubjectService,
-        private questionService: QuestionService ) { }
+        private questionService: QuestionService,
+        private http: HttpClient ) { }
     onSubmit(event: any){
         const text = this.search.value['text'];
         if(text){
@@ -40,8 +44,6 @@ export class WelcomeComponent implements OnInit {
         this.search.reset();
         
     }
-
-
     onError(text: string, duration: number = 1000){
         this.error = text;
         setTimeout(

@@ -1,0 +1,52 @@
+@import '~@taiga-ui/core/styles/taiga-ui-local';
+h2{
+    font-size: 34px;
+    margin-top: 0;
+}  
+h3{
+    font-size: 30px;
+    margin-bottom: 0.5em;
+    &.nomg{
+        margin-top: 0;
+    }
+}
+h4{
+    font-size: 24px;
+    margin-top: 0;
+}
+h5{
+    color: #184042;
+    font-size: 16px;
+    margin-bottom: 0.5em;
+}
+
+.user_info{
+    box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    padding: 20px;
+
+    .info_row{
+        display: flex;
+        gap: 1em;
+        .info_name{
+            flex: 1 0 40%;
+            font-size: 1.2em;
+        }
+        .info_value{
+            flex: 1 0 60%;
+        }
+    }
+
+}
+
+.faq{
+    border-left: 1px solid rgba(9, 21, 27, 0.25);
+    padding-left: 1em;
+    @media @tui-mobile {
+        margin-top: 2em;
+        padding-top: 1em;
+        border-left: 0;
+        padding-left: 0;
+        border-top: 1px solid rgba(9, 21, 27, 0.25);;
+    }
+}
