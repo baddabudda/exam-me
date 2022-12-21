@@ -30,13 +30,13 @@ module.exports.checkOrder = ({ listId, order }) => {
 }
 
 module.exports.createQuestion = ({ connection, listId, userId, date, order, title, body }) => {
+    console.log(listId, userId, date, order, title, body)
     return executor.execute({
         connection: connection,
         query:
-            "INSERT INTO question (list_id, user_id, edit_date, " +
-            "question_order, question_title, question_body, is_deleted) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-        params: [listId, userId, date, order, title, body, 0],
+            "INSERT INTO question (list_id, user_id, edit_date, question_order, question_title, question_body, is_deleted) " +
+            "VALUE (?, ?, ?, ?, ?, ?, 0)",
+        params: [listId, userId, date, order, title, body],
         single: true
     });
 }

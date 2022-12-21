@@ -16,7 +16,7 @@ const routes: Routes = [
   {path:"list", children:[
     {path:":list_id", children:[
       {path:"", component:QuestionComponent},
-      {path:"question/:question_id", component:AnswerComponent}
+      {path:":question_id", component:AnswerComponent}
     ]}
   ]},
   {path:"login", component: LoginComponent, canActivate: [AuthGuard]},

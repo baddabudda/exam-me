@@ -4,12 +4,13 @@ const { pool } = require('../config/config.js');
 
 // check list accessibility
 module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
-    return executor.execute({
+    const res = executor.execute({
         query:
             "SELECT * FROM lists, users WHERE lists.list_id = ? AND lists.group_id = users.group_id AND users.group_id = ? AND users.user_id = ?",
         params: [list_id, group_id, user_id],
         single: true
     });
+    return(res)
 }
 
 // check admin privilege for list
@@ -96,7 +97,7 @@ module.exports.createList = ({ group_id, subject_id, list_name, is_public, semes
             "INSERT INTO lists (group_id, subject_id, list_name, is_public, semester) " +
             "VALUES (?, ?, ?, ?, ?)",
         params: [group_id, subject_id, list_name, is_public, semester],
-        single: true
+        single: false
     });
 }
 

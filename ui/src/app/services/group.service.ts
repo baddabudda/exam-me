@@ -12,8 +12,11 @@ export class GroupService {
     getGroup(){
         return this.auth.currentUser.pipe(switchMap(user => {
             if(!user) return throwError(() => "Unauthorized");
-            return this.httpClient.get<Group>(`${HOST}/group/${user.group_id}`, getHttpOptions())
+            return this.httpClient.get<Group>(`${HOST}/api/group/${user.group_id}`, getHttpOptions())
         }))
+    }
+    postGroup(group: Group){
+        return this.httpClient.post(`${HOST}/api/group/create`, group, getHttpOptions())
     }
     
 }

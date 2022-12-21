@@ -15,13 +15,15 @@ export interface list{
     }
 
 export interface question{
-    id: number,
-    name: string,
-    list_id: number,
-    last_change: string,
-    order: number,
-    body: string,
-    }
+    question_id: number,
+    list_id: number, 
+    user_id: number, 
+    edit_date: string, 
+    question_order: number, 
+    question_title: string, 
+    question_body: string, 
+    is_deleted: boolean
+}
 
 export interface user{
     user_id: number,
@@ -40,4 +42,16 @@ export interface Group{
     group_admin: number,
     group_name: string,
     course: number,
+    members: user[],
+    lists: list[]
+}
+
+export interface Faculty{
+    faculty_id: number,
+    faculty_name: string,
+}
+
+export interface Program{
+    program_id: number,
+    program_name: string,
 }

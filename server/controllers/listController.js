@@ -73,13 +73,14 @@ module.exports.createList_post = async (req, res) => {
         }
 
         // if everything is ok, create new list
-        await listModel.createList({
+        const result = await listModel.createList({
             group_id: req.user.group_id,
             subject_id: req.body.subject_id,
             list_name: req.body.list_name,
             is_public: req.body.is_public,
             semester: req.body.semester
         });
+        res.status(200).json({id: result.insertId});
     } catch (error) {
         errorHandler({ res: res, code: 500, error: error.message });
     }
@@ -108,16 +109,15 @@ module.exports.publishList_post = async (req, res) => {
 // get list by id
 module.exports.getListById = async (req, res) => {
     try{
-        const list_id = req.params.list_id;
+        const list_id = req.params.listid;
         if (!isNan(parseInt(list_id))){
-            const currentList = await list.getById(list_id);
+            const currentList = await listModel.getById(list_id);
             res.status(200).json( currentList );
         } else {
             throw {code: 400, message: 'list_id is not a number!'};
         }
     } catch (err) {
-        console.log(err);
-        errorHandler(res, err);
+        errorHandler({res: res, code: 500, err: err});
     }
 }
 

@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <div class="tui-row tui-row_adaptive" >
+    <div class="tui-row tui-row_adaptive" style="flex-direction: column; align-items: center;">
         <form [formGroup]="search" class="tui-col_lg-10 tui-col_md-12 tui-col_xs-12 search" (ngSubmit)="onSubmit($event)" >
             <tui-input (tuiActiveZoneChange)="questionListOpened=questionListOpened && $event"
             [tuiDropdown]="questionListTemplate"
@@ -69,8 +69,9 @@ style="text-align: center;">
        class="subjectButton"
        appearance="secondary" 
        *ngFor="let question of findQuestions"
-       routerLink="/list/{{question.list_id}}/question/{{question.id}}"
+       routerLink="/list/{{question.list_id}}/question/{{question.question_id}}"
+       [queryParams]="{public: true}"
        size="s">
-       {{question.name}}</a>
+       {{question.question_title}}</a>
    </div>
 </ng-template>

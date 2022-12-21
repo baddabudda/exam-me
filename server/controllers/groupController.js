@@ -8,6 +8,7 @@ const programModel = require('../models/programModel.js');
 const userModel = require('../models/userModel.js');
 const listModel = require('../models/listModel.js');
 const keys = require('../config/keys.js');
+const {pool} = require('../config/config')
 
 require('dotenv').config()
 
@@ -78,7 +79,7 @@ module.exports.groupInfo_get = async (req, res) => {
         let memberInfo = await userModel.getGroupMembers({ group_id: req.params.groupid });
         let listInfo = await listModel.getListsByGroup({ group_id: req.params.groupid });
 
-        res.status(200).json(groupInfo, memberInfo, listInfo);
+        res.status(200).json({...groupInfo, members: memberInfo,lists: listInfo});
     } catch (error) {
         errorHandler({ res: res, code: 500, error: error.message });
     }
@@ -99,17 +100,20 @@ module.exports.createGroup_post = async (req, res) => {
             throw new Error(`${ content.errors.group_name ? content.errors.group_name : content.errors.course }`);
         }
 
-        let match = checkMatch({
-            faculty_id: req.body.faculty_id,
-            program_id: req.body.program_id
-        }).then (result => {
-            if (!result.pass) {
-                throw new Error(`${ result.errors.faculty ? result.errors.faculty : result.errors.program }`);
-            }
-        }).catch (error => {
-            throw new Error("Unexpected error in matching ids");
-        })
+        let result;
+        try{
+            result = await checkMatch({
+                faculty_id: req.body.faculty_id,
+                program_id: req.body.program_id
+            })
 
+        } catch (error) {
+            throw new Error("Unexpected error in matching ids");
+        }
+
+        if (!result.pass) {
+            throw new Error(`${ result.errors.faculty ? result.errors.faculty : result.errors.program }`);
+        }
         // if no errors, then begin transaction
         let connection = undefined;
 
@@ -121,7 +125,6 @@ module.exports.createGroup_post = async (req, res) => {
             await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
             await connection.beginTransaction();
             await connection.query("LOCK TABLES academgroups WRITE, users WRITE");
-
             await groupModel.createGroup({
                 connection: connection,
                 faculty_id: req.body.faculty_id,
@@ -130,7 +133,6 @@ module.exports.createGroup_post = async (req, res) => {
                 group_name: req.body.group_name,
                 course: req.body.course
             });
-
             let [rows, fields] = await connection.query("SELECT last_insert_id()");
             let group_id = Object.values(rows[0])[0];
 
@@ -140,6 +142,8 @@ module.exports.createGroup_post = async (req, res) => {
             // the end of transaction: commit changes and release connection {id: order, id: order, id: order}
             await connection.commit();
             pool.releaseConnection(connection);
+
+            res.status(200).json('Success')
         } catch (error) {
             // cancel transaction results and release connection
             connection.rollback();

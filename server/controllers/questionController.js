@@ -33,6 +33,7 @@ const checkContents = (contents) => {
 
 // GET-request for getting all questions from list
 module.exports.getAllQuestions_get = async (req, res) => {
+    console.log(nen)
     try {
         if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.list_id })) {
             throw new Error ("Access denied: no membership to view questions");
@@ -47,6 +48,7 @@ module.exports.getAllQuestions_get = async (req, res) => {
 
 // GET-request for getting all questions from public list
 module.exports.getPublicQuestions_get = async (req, res) => {
+    console.log('туть')
     try {
         console.log(parseInt(req.params.listid));
         if (!await listModel.checkPublic({ list_id: parseInt(req.params.listid) })) {
@@ -64,7 +66,7 @@ module.exports.getPublicQuestions_get = async (req, res) => {
 module.exports.getQuestion_get = async (req, res) => {
     try {
         // check access to list
-        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.list_id })) {
+        if (!(await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.list_id }))) {
             throw new Error ("Access denied: no membership to view question");
         }
 
@@ -83,78 +85,88 @@ module.exports.getQuestion_get = async (req, res) => {
 module.exports.createQuestion_post = async (req, res) => {
     try {
         // check user access
-        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.list_id })) {
+        const access = await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.body.list_id })
+        if (!access) {
             throw new Error ("Access denied: no membership to view questions");
         }
         // check whether question with such order exists
+        console.log(req.body.question_order)
         let orderCheck = await questionModel.checkOrder({
-            listId: req.params.list_id,
-            order: req.body.order
+            listId: req.body.list_id,
+            order: req.body.question_order
         });
-        if (orderCheck) {
+        if (orderCheck && orderCheck.length) {
             res.status(204).json({ success: true, message: 'Question with such order already exists' });
             return;
         }
+        console.log('hi')
         // check contents of question: order, title, body whether they are not empty and order is number
-        let content = checkContents(req.body);
-        if (!content.pass) {
-            res.status(204).json({ success: true, message: content.errors });
-            return;
-        }
-
+        // let content = checkContents({order: req.body.question_order, title: req.body.question_title , body: req.body.question_body});
+        // if (!content.pass) {
+        //     res.status(204).json({ success: true, message: content.errors });
+        //     return;
+        // }
+        console.log('hi')
         let connection = undefined;
 
             try {
+                console.log('hi')
                 // get connection
                 connection = await pool.promise().getConnection();
                 // if we have connection, then make queries
                 // set isolation level and begin transaction
-                await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
-                await connection.beginTransaction();
-
-                // lock tables: WRITE = only current connection can read & write data to (question, versioned) tables
-                await connection.query("LOCK TABLES question WRITE, versioned WRITE");
-
+                // await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
+                // await connection.beginTransaction();
+                // console.log('hi')
+                // // lock tables: WRITE = only current connection can read & write data to (question, versioned) tables
+                // await connection.query("LOCK TABLES question WRITE, versioned WRITE");
+                // console.log('hi')
                 // make queries
                 let timeElapsed = Date.now();
                 let date = new Date(timeElapsed);
-                console.log(date.toISOString().slice(0, 19));
+                console.log(date.toISOString().slice(0, 19).replace('T', ' '));
                 // insert new row into question table
+                console.log('hi')
                 await questionModel.createQuestion({ 
                     connection: connection, 
-                    listId: req.params.list_id,
-                    userId: req.user.id, 
-                    date: date, 
-                    order: req.body.order,
-                    title: req.body.title, 
-                    body: req.body.body 
+                    listId: parseInt(req.body.list_id),
+                    userId: req.user.user_id, 
+                    date: date.toISOString().slice(0, 19).replace('T', ' '), 
+                    order: req.body.question_order,
+                    title: req.body.question_title, 
+                    body: req.body.question_body 
                 });
+                console.log('hi')
                 // get id of recently created question (for that connection)
                 let [rows, fields] = await connection.query("SELECT last_insert_id()");
                 let quest_id = Object.values(rows[0])[0];
                 // insert new version into versioned table
+                console.log('hi')
                 await questionModel.createVersion({ 
                     connection: connection, 
-                    date: date, 
-                    listId: req.params.list_id,
-                    userId: req.user.id, 
+                    date: date.toISOString().slice(0, 19).replace('T', ' '), 
+                    listId: req.body.list_id,
+                    userId: req.user.user_id, 
                     questId: quest_id, 
-                    title: req.body.title, 
-                    body: req.body.body
+                    title: req.body.question_title, 
+                    body: req.body.question_body
                 });
+                console.log('hi')
                 // unlock tables after writing data
                 await connection.query("UNLOCK TABLES");
 
                 // the end of transaction: commit changes and release connection
                 await connection.commit();
-                pool.releaseConnection(connection);
+                console.log('hi')
+                connection.release()
             } catch (error) {
                 // cancel transaction results and release connection
                 connection.rollback();
                 console.error(error);
-                pool.releaseConnection(connection);
+                connection.release()
                 throw new Error('Cannot create new question');
             }
+        res.status(200).json({status: 'OK', message: 'Question created'});
     } catch (error) {
         errorHandler({ res: res, code: 500, error: error.message });
     };
@@ -164,7 +176,7 @@ module.exports.createQuestion_post = async (req, res) => {
 }
 
 // POST-request for editing question
-module.exports.editQuestion_post = async (req, res) => {
+module.exports.editQuestion_put = async (req, res) => {
     try {
         // check user access
         if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.list_id })) {

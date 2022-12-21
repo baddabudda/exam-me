@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { concatMap, tap } from 'rxjs';
 import { Group, user } from 'src/app/interfaces/interfaces';
 import { AuthService } from 'src/app/services/auth.service';
@@ -17,7 +18,8 @@ export class ProfileComponent implements OnInit {
 
     constructor(
         private auth: AuthService,
-        private groupService: GroupService
+        private groupService: GroupService,
+        private router: Router
     ) { 
         auth.currentUser.pipe(
             tap(user => this.user = user ? user : undefined),
@@ -33,5 +35,8 @@ export class ProfileComponent implements OnInit {
     getRole(){
         const admin = (this.group && this.user) && this.group.group_admin == this.user.user_id;
         return `${admin ? "Староста" : "Участник"} группы`
+    }
+    logout(){
+        this.auth.logout().subscribe(res => this.router.navigate(['/']));
     }
 }

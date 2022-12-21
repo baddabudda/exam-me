@@ -29,7 +29,7 @@ export class WelcomeComponent implements OnInit {
     onSubmit(event: any){
         const text = this.search.value['text'];
         if(text){
-            this.questionService.findQuestion(text).subscribe(res=>{
+            this.questionService.findQuestions(text).subscribe(res=>{
                 if(res.length){
                     this.findQuestions=res;
                     this.questionListOpened = true;}

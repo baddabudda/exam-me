@@ -11,15 +11,16 @@ export class ListService {
         private http: HttpClient,
     ) { }
     getLists(subject_id: number){
-        return this.http.get<list[]>(`${HOST}/api/lists/public/${subject_id}`, getHttpOptions())
+        return this.http.get<list[]>(`${HOST}/api/lists/public/subject/${subject_id}`, getHttpOptions())
         // return(of(lists.filter(list=>(list.subject_id==subject_id))))
 
     }
-    getList(list_id: number){
-        return this.http.get<list>(`${HOST}/api/lists/${list_id}`, getHttpOptions())
-        // const res = lists.find(list=>(list.id==list_id));
-        // return res?of(res):throwError(()=>'not found')
+    getList(list_id: number, pub: boolean = false){
+        return this.http.get<list>(`${HOST}/api/lists/${pub ? 'public/' : ''}${list_id}`, getHttpOptions())
+    }
 
+    createList(list: list){
+        return this.http.post(`${HOST}/api/lists/${list.group_id}/create-list`, list, getHttpOptions());
     }
     
 }

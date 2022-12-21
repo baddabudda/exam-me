@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter } from 'rxjs';
+import { BehaviorSubject, filter, tap } from 'rxjs';
 import { user } from '../interfaces/interfaces';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { HOST } from 'src/config';
@@ -7,12 +7,6 @@ import { CookieService } from 'ngx-cookie';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
-
-    session?: {
-        key: string,
-        sig: string
-    };
-
     currentUserSubject = new BehaviorSubject<undefined|null|user> (undefined);
     public currentUser = this.currentUserSubject.asObservable().pipe(filter(u=> u!==undefined));
 
@@ -39,6 +33,11 @@ export class AuthService {
     }
     editProfile(user: user){
         return this.http.put<user>(`${HOST}/api/profile/edit`, user, getHttpOptions());
+    }
+    logout(){
+        return this.http.get(`${HOST}/auth/logout`, getHttpOptions()).pipe(
+            tap(res => this.currentUserSubject.next(null))
+        )
     }
 }
 

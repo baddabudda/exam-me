@@ -71,9 +71,10 @@
         appearance="secondary" 
         *ngFor="let question of findQuestions"
         size="s"
-        routerLink="/list/{{question.list_id}}/question/{{question.id}}"
+        routerLink="/list/{{question.list_id}}/{{question.question_id}}"
+        [queryParams]="{public: true}"
         (click)="questionListOpened = false"
     >
-        {{question.name}}</a>
+        {{question.question_title}}</a>
     </div>
  </ng-template>

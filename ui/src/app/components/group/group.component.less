@@ -1,0 +1,29 @@
+@import '~@taiga-ui/core/styles/taiga-ui-local';
+.tui-row{
+    justify-content: center;
+}
+
+.joc{
+    text-align: center;
+    .youcan{
+        font-size: 0.8em;
+        margin: 0;
+    }
+    button{
+        display: block;
+        margin: 2em auto;
+    }
+}
+
+.creation{
+    width: 50%;
+    margin: auto;
+    &>*{
+        margin-bottom: 1em;
+        .shadow(2);
+   }
+
+   @media @tui-mobile {
+        width: 100%;
+   }
+}

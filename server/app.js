@@ -29,10 +29,7 @@ const app = express();
 // --- getting info about queries ---
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
-
-// --- for parsing .json files ---
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.json());
 
 // --- parse cookies and sessions ---
 app.use(require('cookie-parser')());

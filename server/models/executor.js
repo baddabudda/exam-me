@@ -25,6 +25,7 @@ module.exports.execute = ({ connection, query, params, single}) => {
             let result = await connection.execute(query, params);
             resolve(single ? result[0][0] : result[0]);
         } catch (error) {
+            console.log(error)
             reject(new Error('Query cannot be executed'));
         };
     });   
