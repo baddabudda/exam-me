@@ -1,6 +1,6 @@
 // importing query executor
 const executor = require('./executor.js');
-const pool = require('../config/config.js');
+const { pool } = require('../config/config.js');
 
 // check list accessibility
 module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
@@ -16,7 +16,7 @@ module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
 module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
     return executor.execute({
         query:
-            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id" +
+            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id " +
             "AND academgroups.group_id = ? AND academgroups.group_admin = ?",
         params: [list_id, group_id, user_id],
         single: true
@@ -60,5 +60,46 @@ module.exports.getListLengthById = ({ listId }) => {
             "SELECT COUNT(*) FROM lists WHERE list_id = ?",
         params: [listId],
         single: true
+    });
+}
+
+// creating list
+module.exports.createList = ({ group_id, subject_id, list_name, is_public, semester }) => {
+    return executor.execute({
+        query: 
+            "INSERT INTO lists (group_id, subject_id, list_name, is_public, semester) " +
+            "VALUES (?, ?, ?, ?, ?)",
+        params: [group_id, subject_id, list_name, is_public, semester],
+        single: true
+    });
+}
+
+// publish list
+module.exports.publishList = ({ list_id }) => {
+    return executor.execute({
+        query:
+            "UPDATE lists SET is_public = 1 WHERE list_id = ?",
+        params: [list_id],
+        single: true
+    });
+}
+
+// check list publicity
+module.exports.checkPublic = ({ list_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM lists WHERE list_id = ? AND is_public = 1",
+        params: [list_id],
+        single: true
+    });
+}
+
+// get lists by group
+module.exports.getListsByGroup = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM lists WHERE group_id = ?",
+        params: [group_id],
+        single: false
     });
 }

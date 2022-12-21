@@ -1,14 +1,19 @@
 const userModel = require('../models/userModel.js');
 const passport = require('passport');
+require('dotenv').config();
 
 // redirect after authotization
-module.exports.redirect = (req, res) => {
+module.exports.redirect = async (req, res) => {
     if (req.user.status){
         // if 1 = not registrational authorization
-        res.status(200).json({ success: true, message: "Authorized successfully; return to the page", user: req.user });
+        // res.status(200).json({ success: true, message: "Authorized successfully; return to the page", user: req.user });
+        // await userModel.changeStatus({ user_id: req.user.user_id });
+        // res.redirect('/api/profile/');
+        res.redirect(`${process.env.UI_HOST}/`)
     } else if (!req.user.status) {
         // if 0 = registrational authorization
-        res.redirect('/profile/');
+        res.redirect(`${process.env.UI_HOST}/login`)
+        // res.redirect('/api/profile/');
         // res.status(200).json({ success: true, message: "Authorized successfully; redirect profile page", user: req.user });
     } else {
         res.status(401).json({ success: false, message: "Authorization failed" });

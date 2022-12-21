@@ -1,8 +1,10 @@
 const executor = require('./executor.js');
+const { pool } = require('../config/config.js');
 
 // create group
-module.exports.createGroup = ({ faculty_id, program_id, admin_id, group_name, course }) => {
+module.exports.createGroup = ({ connection, faculty_id, program_id, admin_id, group_name, course }) => {
     return executor.execute({
+        connection: connection,
         query:
             "INSERT INTO academgroups (faculty_id, program_id, group_admin, " +
             "group_name, course, is_closed) " +
@@ -77,7 +79,7 @@ module.exports.getGroupAdmin = ({ group_id }) => {
 module.exports.checkPrivilege = ({ group_id, user_id }) => {
     return executor.execute({
         query:
-            "SELECT COUNT(*) FROM academgroups WHERE group_admin = ? AND group_id = ?",
+            "SELECT * FROM academgroups WHERE group_admin = ? AND group_id = ?",
         params: [user_id, group_id],
         single: true
     });

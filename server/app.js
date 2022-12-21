@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser')
 const passport = require('passport');
 const cookieSession = require('cookie-session');
+const cors = require('cors');
 
 // === INNER PROJECT REQUIREMENTS ===
 // --- Configuration, etc. ---
@@ -19,9 +20,10 @@ const passportSetup = require('./config/passport-setup.js');
 // === DOTENV CONFIG ===
 require('dotenv').config();
 
+const PORT = process.env.PORT || 3000;
+
 // === CREATING EXPRESS APP
 const app = express();
-app.listen(3000);
 
 // === MIDDLEWARE ===
 // --- getting info about queries ---
@@ -44,9 +46,16 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// --- enable cors ---
+app.use(cors({ origin: "http://localhost:4200", credentials: true }));
+
 // --- routing ---
-app.use(singleRoutes);
+app.use('/api', singleRoutes);
 app.use('/auth', authRoutes);
-app.use('/profile', profileRoutes);
-app.use('/group', groupRoutes);
-app.use('/list', questionRoutes);
+
+// --- something ---
+app.get('/', (res, req) => {
+    req.send("Hello, world!")
+})
+
+app.listen(PORT, () => console.log(`Exam Me backend is working...`));

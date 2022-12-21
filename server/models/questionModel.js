@@ -1,11 +1,11 @@
 const executor = require('./executor.js');
 
 // === QUESTION - LISTS requests ===
-module.exports.getAllQuestionsByListId = ({ listId }) => {
+module.exports.getAllQuestionsByListId = ({ list_id }) => {
     return executor.execute({
         query:
             "SELECT * FROM question WHERE list_id = ?",
-        params: [listId],
+        params: [list_id],
         single: false
     });
 };
@@ -51,12 +51,12 @@ module.exports.selectQuestionForUpdate = ({ connection, questId }) => {
     });
 }
 
-module.exports.updateQuestion = ({ connection, questId, date, order, title, body }) => {
+module.exports.updateQuestion = ({ connection, user_id, questId, date, order, title, body }) => {
     return executor.execute({
         connection: connection,
         query:
-            "UPDATE question SET edit_date = ?, question_order = ?, question_title = ?, question_body = ? WHERE question_id = ?",
-        params: [date, order, title, body, questId],
+            "UPDATE question SET user_id = ?, edit_date = ?, question_order = ?, question_title = ?, question_body = ? WHERE question_id = ?",
+        params: [user_id, date, order, title, body, questId],
         single: true
     });
 }
