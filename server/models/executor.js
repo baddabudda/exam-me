@@ -13,7 +13,8 @@ module.exports.execute = ({ connection, query, params, single}) => {
                 connection.release();
                 resolve(single ? result[0][0] : result[0]);
             } catch (error) {
-                reject(new Error('Query cannot be executed'));
+                reject(error);
+                // reject(new Error('Query cannot be executed'));
             };
         });
     }
