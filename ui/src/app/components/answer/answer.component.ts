@@ -66,7 +66,8 @@ export class AnswerComponent implements OnInit {
         if(!this.question) return;
         this.editing=false;
         this.question.question_body=this.control.value || '';
-        this.questionService.putQuestion(this.question).subscribe(res=>{this.question=res; this.control.setValue(res.question_body)}, error=>this.location.back());
+        this.questionService.putQuestion(this.question).subscribe(res=>{this.question=res; this.control.setValue(res.question_body)});
+        // this.questionService.putQuestion(this.question).subscribe(res=>{this.question=res; this.control.setValue(res.question_body)}, error=>this.location.back());
     }
 
     ngOnInit() {

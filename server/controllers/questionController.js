@@ -33,13 +33,14 @@ const checkContents = (contents) => {
 
 // GET-request for getting all questions from list
 module.exports.getAllQuestions_get = async (req, res) => {
-    console.log(nen)
     try {
-        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.list_id })) {
+        let baseUrl = req.baseUrl.split('/')
+        listid = baseUrl[baseUrl.length-1]
+        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: listid  })) {
             throw new Error ("Access denied: no membership to view questions");
         }
 
-        let questions = await questionModel.getAllQuestionsByListId({ list_id: req.params.list_id });
+        let questions = await questionModel.getAllQuestionsByListId({ list_id: listid  });
         res.status(200).json(questions);
     } catch (error) {
         errorHandler({ res: res, code: 403, error: error.message });
@@ -178,13 +179,14 @@ module.exports.createQuestion_post = async (req, res) => {
 module.exports.editQuestion_put = async (req, res) => {
     try {
         // check user access
-        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.params.list_id })) {
+        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: req.body.list_id })) {
             throw new Error ("Access denied: no membership to view questions");
         }
         // check whether question with passed id exits in database
         let checkExistence = await questionModel.checkInDatabase({
-            questId: req.params.questionid,
-            listId: req.params.list_id
+            
+            questId: req.body.question_id,
+            listId: req.body.list_id
         });
         if (!checkExistence){
             res.status(204).json({ success: true, message: 'Question with such id not found' });
@@ -193,10 +195,10 @@ module.exports.editQuestion_put = async (req, res) => {
 
         // check whether question with such order exists
         let orderCheck = await questionModel.checkOrder({
-            listId: req.params.list_id,
-            order: req.body.order
+            listId: req.body.list_id,
+            order: req.body.question_order
         });
-        if (orderCheck && orderCheck.question_id !== parseInt(req.params.questionid)) {
+        if (orderCheck && orderCheck.question_id !== parseInt(req.body.question_id)) {
             console.log('Question with such order already exists');
         }
         // if (orderCheck) {
@@ -205,12 +207,12 @@ module.exports.editQuestion_put = async (req, res) => {
         // }
 
         // check contents of question: order, title, body whether they are not empty and order is number
-        let checkContent = checkContents(req.body);
+        
+        let checkContent = checkContents({order: req.body.question_order, title: req.body.question_title , body: req.body.question_body});
         if (!checkContent.pass) {
             res.status(204).json({ success: true, message: checkContent.errors });
             return;
         }
-
         // try to establish connection + make transaction
         let connection = undefined;
 
@@ -221,7 +223,6 @@ module.exports.editQuestion_put = async (req, res) => {
                 // set isolation level and begin transaction
                 await connection.query("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
                 await connection.beginTransaction();
-
                 // make queries
                 let timeElapsed = Date.now();
                 let date = new Date(timeElapsed);
@@ -229,30 +230,30 @@ module.exports.editQuestion_put = async (req, res) => {
                 // lock record's editing for other connections in question table
                 await questionModel.selectQuestionForUpdate({
                     connection: connection,
-                    questId: req.params.questionid
+                    questId: req.body.question_id
                 });
 
                 await questionModel.updateQuestion({
                     connection: connection,
                     user_id: req.user.user_id,
-                    questId: req.params.questionid,
+                    questId: req.body.question_id,
                     date: date,
-                    order: req.body.order,
-                    title: req.body.title,
-                    body: req.body.body
+                    order: req.body.question_order,
+                    title: req.body.question_title,
+                    body: req.body.question_body
                 });
-
+                
                 // place current question record to versioned
                 await questionModel.createVersion({ 
                     connection: connection, 
                     date: date, 
-                    listId: req.params.listid,
+                    listId: req.body.list_id,
                     userId: req.user.user_id, 
                     questId: req.params.questionid, 
-                    title: req.body.title, 
-                    body: req.body.body
+                    title: req.body.question_title, 
+                    body: req.body.question_body
                 });
-
+                console.log('checkExistence')
                 // the end of transaction: commit changes and release connection
                 await connection.commit();
                 pool.releaseConnection(connection);
