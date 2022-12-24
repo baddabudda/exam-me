@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Exam.Me>
+    <DATABASE>
+        <TABLE name="users">
+            <COLUMNS>
+                <COLUMN type="INT">user_id</COLUMN>
+                <COLUMN type="INT">vk_id</COLUMN>
+                <COLUMN type="INT">group_id</COLUMN>
+                <COLUMN type="VARCHAR(45)">user_fname</COLUMN>
+                <COLUMN type="VARCHAR(45)">user_lname</COLUMN>
+                <COLUMN type="VARCHAR(45)">user_pname</COLUMN>
+                <COLUMN type="TINYINT">status</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <CONSTRAINT type="PRIMARY KEY">
+                    <COLUMN>user_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>group_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="UNIQUE">
+                    <COLUMN>vk_id</COLUMN>
+                </CONSTRAINT>
+            </CONSTRAINTS>
+        </TABLE name="academgroups">
+            <COLUMNS>
+                <COLUMN type="INT">group_id</COLUMN>
+                <COLUMN type="INT">faculty_id</COLUMN>
+                <COLUMN type="INT">program_id</COLUMN>
+                <COLUMN type="INT">group_admin</COLUMN>
+                <COLUMN type="VARCHAR(45)">group_name</COLUMN>
+                <COLUMN type="INT">course</COLUMN>
+                <COLUMN type="VARCHAR(255)">access_token</COLUMN>
+                <COLUMN type="TINYINT">is_closed</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <CONSTRAINT type="PRIMARY KEY">
+                    <COLUMN>group_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>faculty_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>program_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>group_admin</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="UNIQUE">
+                    <COLUMN>group_admin</COLUMN>
+                </CONSTRAINT>
+            </CONSTRAINTS>
+        <TABLE name="lists">
+            <COLUMNS>
+                <COLUMN type="INT">list_id</COLUMN>
+                <COLUMN type="INT">group_id</COLUMN>
+                <COLUMN type="INT">subject_id</COLUMN>
+                <COLUMN type="VARCHAR(255)">list_name</COLUMN>
+                <COLUMN type="TINYINT">is_public</COLUMN>
+                <COLUMN type="INT">semester</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <CONSTRAINT type="PRIMARY KEY">
+                    <COLUMN>list_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>group_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>subject_id</COLUMN>
+                </CONSTRAINT>
+            </CONSTRAINTS>
+        </TABLE>
+        <TABLE name="question">
+            <COLUMNS>
+                <COLUMN type="INT">question_id</COLUMN>
+                <COLUMN type="INT">list_id</COLUMN>
+                <COLUMN type="TIMESTAMP">edit_date</COLUMN>
+                <COLUMN type="INT">question_order</COLUMN>
+                <COLUMN type="VARCHAR(255)">question_title</COLUMN>
+                <COLUMN type="MEDIUMTEXT">question_body</COLUMN>
+                <COLUMN type="TINYINT">is_deleted</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <CONSTRAINT type="PRIMARY KEY">
+                    <COLUMN>question_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>list_id</COLUMN>
+                </CONSTRAINT>
+            </CONSTRAINTS>
+        </TABLE>
+        <TABLE name="versioned">
+            <COLUMNS>
+                <COLUMN type="INT">version_id</COLUMN>
+                <COLUMN type="TIMESTAMP">edit_date</COLUMN>
+                <COLUMN type="INT">list_id</COLUMN>
+                <COLUMN type="INT">user_id</COLUMN>
+                <COLUMN type="INT">question_id</COLUMN>
+                <COLUMN type="VARCHAR(255)">question_title</COLUMN>
+                <COLUMN type="MEDIUMTEXT">question_body</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <CONSTRAINT type="PRIMARY KEY">
+                    <COLUMN>version_id, question_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>list_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>question_id</COLUMN>
+                </CONSTRAINT>
+                <CONSTRAINT type="FOREIGN KEY">
+                    <COLUMN>user_id</COLUMN>
+                </CONSTRAINT>
+            </CONSTRAINTS>
+        </TABLE>
+        <TABLE name="faculty">
+            <COLUMNS>
+                <COLUMN type="INT">faculty_id</COLUMN>
+                <COLUMN type="VARCHAR(255)">faculty_name</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <COLUMN>faculty_id</COLUMN>
+            </CONSTRAINTS>
+        </TABLE>
+        <TABLE name="subjects">
+            <COLUMNS>
+                <COLUMN type="INT">subject_id</COLUMN>
+                <COLUMN type="VARCHAR(255)">subject_name</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <COLUMN>subject_id</COLUMN>
+            </CONSTRAINTS>
+        </TABLE>
+        <TABLE name="program">
+            <COLUMNS>
+                <COLUMN type="INT">program_id</COLUMN>
+                <COLUMN type="VARCHAR(255)">program_name</COLUMN>
+            </COLUMNS>
+            <CONSTRAINTS>
+                <COLUMN>program_id</COLUMN>
+            </CONSTRAINTS>
+        </TABLE>
+    </DATABASE>
+    <DESCRIPTION>
+        <TITLE>Exam.me</TITLE>
+        <SECTION name="Описание">
+            <ELEMENT>Онлайн-блокнот для совместного написания конспектов, нацеленный на подготовку к экзаменам. 
+            В конечном итоге они могут представлять собой краткое изложение всего курса 
+            и использоваться для закрепления изученного материала при подготовке к экзаменам.</ELEMENT>
+        </SECTION>
+        <SECTION name="Предметная область">
+            <ELEMENT>Онлайн-конспекты, составленные по примерным спискам экзаменационных 
+            вопросов (статья является ответом на один из вопросов списка).</ELEMENT>
+        </SECTION>
+        <SECTION name="Данные">
+            <ELEMENT name="users">информация о пользователях</ELEMENT>
+            <ELEMENT name="academgroups">информация об академических группах</ELEMENT>
+            <ELEMENT name="lists">список экзаменационных вопросов</ELEMENT>
+            <ELEMENT name="question">актуальная статья-ответ на один из вопросов списка</ELEMENT>
+            <ELEMENT name="versioned">хранилище всех версий статьи-ответа</ELEMENT>
+            <ELEMENT name="faculty">информация о факультете</ELEMENT>
+            <ELEMENT name="subjects">информация о предметах</ELEMENT>
+            <ELEMENT name="program">информация об образовательной программе</ELEMENT>
+        </SECTION>
+        <SECTION name="Для каждого элемента данных - ограничения">
+            <SUBSECTION name="users">
+                <ELEMENT>vk_id должен быть уникальным</ELEMENT>
+                <ELEMENT>group_id по умолчанию null</ELEMENT>
+                <ELEMENT>status по умолчанию null</ELEMENT>
+                <ELEMENT>user_pname по умолчанию null</ELEMENT>
+            </SUBSECTION>
+            <SUBSECTION name="academgroups">
+                <ELEMENT>group_admin должен быть уникальным</ELEMENT>
+                <ELEMENT>access_token по умолчанию null</ELEMENT>
+            </SUBSECTION>
+            <SUBSECTION name="lists">
+                <ELEMENT>is_public может принимать значение 0 или 1</ELEMENT>
+            </SUBSECTION>
+            <SUBSECTION name="question">
+                <ELEMENT>question_body по умолчанию null</ELEMENT>
+                <ELEMENT>is_deleted может принимать значение 0 или 1</ELEMENT>
+            </SUBSECTION>
+        </SECTION>
+        <SECTION name="Общие ограничения целостности">
+            <ELEMENT>К одному факультету и образовательной программе могут относиться нуль 
+            (если не была создана ни одна группа) или несколько групп</ELEMENT>
+            <ELEMENT>К одной академической группе относится хотя бы один пользователь 
+            (и по умолчанию этот пользователь считается старостой, администратором группы)</ELEMENT>
+            <ELEMENT>Один пользователь может состоять в не более чем одной группе</ELEMENT>
+            <ELEMENT>Академическая группа может иметь нуль и более списков вопросов</ELEMENT>
+            <ELEMENT>К одному предмету могут относиться нуль или несколько списков вопросов</ELEMENT>
+            <ELEMENT>Каждая версия ответа на вопрос сохраняется в таблице versioned; самый последний 
+            ответ является актуальным и принадлежит таблице question (т.е. актуальная версия ответа 
+            на вопрос содержится в обеих таблицах)</ELEMENT>
+        </SECTION>
+        <SECTION name="Пользовательские роли">
+            <SUBSECTION name="Cтароста академической группы">
+                <ELEMENT>Управлять академической группой</ELEMENT>
+                <ELEMENT>Управлять списками вопросов, которыми владеет группа</ELEMENT>
+                <ELEMENT>Сделать список вопросов общедоступным</ELEMENT>
+                <ELEMENT>Восстанавливать версию ответа в случае порчи актуальной версии</ELEMENT>
+                <ELEMENT>Передавать свои полномочия другим участникам группы</ELEMENT>
+                <ELEMENT>Удалять пользователей из студенческой группы</ELEMENT>
+            </SUBSECTION>
+            <SUBSECTION name="Пользователь">
+                <ELEMENT>Создать новую академическую группу</ELEMENT>
+                <ELEMENT>Присоединиться к существующей академической группе</ELEMENT>
+                <ELEMENT>Редактировать ответ</ELEMENT>
+                <ELEMENT>Добавлять ответ в список вопросов</ELEMENT>
+            </SUBSECTION>
+            <SUBSECTION name="Неавторизированный пользователь">
+                <ELEMENT>Просмотр общедоступных списков впопросов</ELEMENT>
+            </SUBSECTION>
+        </SECTION>
+    </DESCRIPTION>
+</Exam.me>
