@@ -1,7 +1,33 @@
 const listModel = require('../models/listModel.js');
 const subjectModel = require('../models/subjectModel.js');
 const groupModel = require('../models/groupModel.js');
+const inviteModel = require('../models/inviteModel');
 const errorHandler = require('../utils/errorHandler.js');
+
+// generate json web token for list invitation
+const maxAge = 1 * 5 * 60 * 60; // 5 hrs
+const createToken = ({ group_id, list_id }) => {
+    return jwt.sign({ group_id, list_id }, keys.webtoken.tokenKey, {
+        expiresIn: maxAge
+    });
+}
+
+const verifyToken = (token) => {
+    let result = {
+        pass: true,
+        group_id: undefined,
+        list_id: undefined
+    };
+
+    try {
+        let tmp = jwt.verify(token, keys.webtoken.tokenKey, { complete: true });
+        result.group_id = tmp.payload.host_id;
+        result.list_id = tmp.payload.list_id;
+    } catch (error) {
+        result.pass = false;
+        return result;
+    }
+}
 
 // check body for emptiness
 const checkContents = (contents) => {
@@ -38,25 +64,30 @@ module.exports.getPublicBySubjectId_get = async (req, res) => {
     try {
         // if subjectid is number, then work
         if (isNaN(parseInt(req.params.subjectid))){
-            throw new Error("Subject is should be a number");
+            throw new Error("406 Subject is should be a number");
         }
         // if requested subject id exists in database
         let subject = await subjectModel.getSubjectById(req.params.subjectid);
         if (!subject) {
-            throw new Error("Subject with given id doesn't exist in database");
+            throw new Error("406 Subject with given id doesn't exist in database");
         }
 
         // if everything is ok, send all public lists to display
         const lists = await listModel.getPublicBySubjId(req.params.subjectid);
         res.status(200).json(lists);
     } catch (error) {
-        errorHandler({ res: res, code: 500, error: error.message });
+        errorHandler({ res: res, error: error });
     }
 };
 
 // creating new list
 module.exports.createList_post = async (req, res) => {
     try {
+        const listOwner_id = await listModel.getListOwner({ list_id: req.body.list_id });
+        // check is_closed
+        if (listOwner_id.is_closed) {
+            throw new Error("403 Access denied: group has been closed");
+        }
         // check group membership
         if (!req.user.group_id) {
             throw new Error ("Can't create new list: user isn't a member of any group");
@@ -122,3 +153,95 @@ module.exports.getListById = async (req, res) => {
 }
 
 const isNan = (val) => val === NaN;
+
+// generate new token for list invitation; must return link
+module.exports.shareList_post = async (req, res) => {
+    try {
+        // check admin privilege
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error("403 Access denied: not group admin");
+        }
+        // check whether list belongs to that group
+        if (!await listModel.checkListOwner({ list_id: req.body.list_id, group_id: req.body.group_id })) {
+            throw new Error("406 List doesn't belong to this group");
+        }
+        // check whether list has good token
+        let token = await listModel.checkToken({ list_id: req.body.list_id, group_id: req.body.group_id });
+        // verifyToken returns false if token = undefined
+        let verified = verifyToken(token);
+        if (!token || !verified.pass) {
+            // if list doesn't have token or is expired, then create new token
+            token = createToken({ group_id: req.body.group_id, list_id: req.body.list_id });
+            await listModel.updateToken({
+                token: token, 
+                list_id: req.body.list_id, 
+                group_id: req.body.group_id 
+            }).catch(error => {
+                throw new Error("500 Couldn't update token: " + error.message);
+            });
+        }
+        
+        // OPEN ISSUE: redirect link required !!!!!
+        res.status(200).json(`${process.env.UI_HOST}/shared/:${token}`);
+    } catch (error) {
+        errorHandler({ res: res, error: error });
+    }
+}
+
+// accept shared list
+module.exports.acceptList_post = async (req, res) => {
+    try {
+        // check admin privilege to accept invitation
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error("403 Access denied: not group admin");
+        }
+        // verify token
+        let verified = verifyToken(res.query.token);
+        // if token has expired
+        if (!verified.pass) {
+            throw new Error("403 Access token has expired");
+        }
+        // if everything is cool, insert invite
+        await inviteModel.acceptInvite({
+            group_host_id: verified.group_id,
+            group_guest_id: req.user.group_id,
+            list_id: verified.list_id
+        }).catch(error => {
+            throw new Error("500 Couldn't accept invite " + error.message);
+        })
+
+        res.status(200).json("Accepted list invite successfully");
+    } catch (error) {
+        errorHandler({ res: res, error: error});
+    }
+}
+
+// change access level
+module.exports.changeAccessLevel_put = async (req, res) => {
+    try {
+        // check admin privilege to change access level
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_host_id });
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error("403 Access denied: not group admin");
+        }
+        // check invitation record
+        if (!await inviteModel.checkInvite({ group_host_id: req.body.group_host_id, group_guest_id: req.body.group_guest_id, list_id: req.body.list_id } )) {
+            throw new Error("406 No invite with given parameters found");
+        }
+        // if ok, then
+        await inviteModel.changeAccessLevel({
+            group_host_id: req.body.group_host_id, 
+            group_guest_id: req.body.group_guest_id, 
+            list_id: req.body.list_id,
+            access_level: req.body.access_level
+        }).catch (error => {
+            throw new Error("500 Can't change acces level " + error.message);
+        })
+
+        res.status(200).json("Access level changed successfully");
+    } catch (error) {
+        errorHandler({ res: res, error: error});
+    }
+}

@@ -33,11 +33,26 @@ const checkContents = ({ group_name, course }) => {
 }
 
 // generate json web token
-const maxAge = 1 * 5 * 60 * 60; // 1 day
+const maxAge = 1 * 5 * 60 * 60; // 5 hrs
 const createToken = ({ group_id }) => {
     return jwt.sign({ group_id }, keys.webtoken.tokenKey, {
         expiresIn: maxAge
     });
+}
+
+const verifyToken = (token) => {
+    let result = {
+        pass: true,
+        group_id: undefined
+    };
+
+    try {
+        let tmp = jwt.verify(token, keys.webtoken.tokenKey, { complete: true});
+        result.group_id = tmp.payload.group_id;
+    } catch (error) {
+        result.pass = false;
+        return result;
+    }
 }
 
 // check whether form sent correct faculty/program ids (that corresponds to db rows)
@@ -65,14 +80,14 @@ module.exports.groupInfo_get = async (req, res) => {
     try {
         let group_id = parseInt(req.params.groupid);
         if (isNaN(group_id)){
-            throw new Error("Group id is not a number");
+            throw new Error("406 Group id is not a number");
         }
         if (!await groupModel.getGroupById({ group_id: group_id })){
-            throw new Error("Group with given id not found");
+            throw new Error("406 Group with given id not found");
         }
         // console.log(req.user);
         if (req.user.group_id !== group_id){
-            throw new Error("Access denied: not a member");
+            throw new Error("403 Access denied: not a member");
         }
 
         let groupInfo = await groupModel.getGroupInfoById({ group_id: req.params.groupid });
@@ -81,14 +96,14 @@ module.exports.groupInfo_get = async (req, res) => {
 
         res.status(200).json({...groupInfo, members: memberInfo,lists: listInfo});
     } catch (error) {
-        errorHandler({ res: res, code: 500, error: error.message });
+        errorHandler({ res: res, error: error });
     }
 }
 
 module.exports.createGroup_post = async (req, res) => {
     try {
         if (req.user.group_id) {
-            throw new Error("User is a member of another group already");
+            throw new Error("405 User is a member of another group already");
         }
 
         let content = checkContents({
@@ -97,7 +112,7 @@ module.exports.createGroup_post = async (req, res) => {
         });
         
         if (!content.pass) {
-            throw new Error(`${ content.errors.group_name ? content.errors.group_name : content.errors.course }`);
+            throw new Error(`406 ${ content.errors.group_name ? content.errors.group_name : content.errors.course }`);
         }
 
         let result;
@@ -108,11 +123,11 @@ module.exports.createGroup_post = async (req, res) => {
             })
 
         } catch (error) {
-            throw new Error("Unexpected error in matching ids");
+            throw new Error("500 Unexpected error in matching ids");
         }
 
         if (!result.pass) {
-            throw new Error(`${ result.errors.faculty ? result.errors.faculty : result.errors.program }`);
+            throw new Error(`500 ${ result.errors.faculty ? result.errors.faculty : result.errors.program }`);
         }
         // if no errors, then begin transaction
         let connection = undefined;
@@ -149,11 +164,10 @@ module.exports.createGroup_post = async (req, res) => {
             connection.rollback();
             console.error(error);
             pool.releaseConnection(connection);
-            throw new Error('Cannot execute query');
+            throw new Error('500 Cannot execute query');
         }
     } catch (error) {
-        let displayError = new Error("Couldn't create group: " + error.message);
-        errorHandler({ res: res, code: 406, error: displayError});
+        errorHandler({ res: res, error: error });
     }
 }
 
@@ -170,7 +184,7 @@ module.exports.editGroup_put = async (req, res) => {
 
         let admin_id = await groupModel.getGroupAdmin({ group_id: req.params.groupid });
         if (req.user.user_id !== admin_id.group_admin) {
-            throw new Error("Access denied: not group admin");
+            throw new Error("403 Access denied: not group admin");
         }
 
         await groupModel.editGroup({
@@ -179,8 +193,7 @@ module.exports.editGroup_put = async (req, res) => {
             course: req.body.course
         });
     } catch (error) {
-        let displayError = new Error("Couldn't update group info: " + error.message);
-        errorHandler({ res: res, code: 406, error: displayError.message });
+        errorHandler({ res: res, error: error });
     }
 }
 
@@ -188,23 +201,183 @@ module.exports.editGroup_put = async (req, res) => {
 module.exports.generateInvitation_get = async (req, res) => {
     try {
         let admin_id = await groupModel.getGroupAdmin({ group_id: req.params.groupid });
-        if (req.user.user_id !== admin_id) {
-            throw new Error("Access denied: not group admin");
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error("403 Access denied: not group admin");
         }
-
-        const token = createToken({ group_id: req.params.groupid });
-        await groupModel.assignToken({
-            group_id: req.params.groupid,
-            access_token: token
-        });
-
+        let token = await groupModel.getToken({ group_id: req.params.groupid });
+        token = token ? token.token : null;
+        if (!token || !verifyToken(token).pass) {
+            token = createToken({ group_id: req.params.groupid });
+            await groupModel.assignToken({
+                group_id: req.params.groupid,
+                access_token: token
+            }).catch(error => {
+                throw new Error("500 Can't assign new token")
+            });
+        }
+    
         // exam.me/join/group/:access_token
         res.status(200).json(`${process.env.UI_HOST}/join/:${token}`);
     } catch (error) {
-        errorHandler({ res: res, code: 500, error: "Can't generate token: " + error.message });
+        errorHandler({ res: res, error: error });
     }
 }
 
-// module.exports.closeGroup_post = async (req, res) => {
-//
-// }
+// expel member from the group
+module.exports.expelMember_put = async (req, res) => {
+    try {
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        // check whether user has admin privilege
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error ("403 Can't perform expelling: not a group admin");
+        }
+        // check whether admin tries to expel themselves
+        if (admin_id === req.body.delete_user_id) {
+            throw new Error ("405 Can't expel admin");
+        }
+        // check whether user belongs to the group
+        let member_id = await groupModel.checkMembership({ group_id: req.body.group_id, user_id: req.body.delete_user_id });
+        if (!member_id) {
+            throw new Error ("405 User isn't a group member");
+        }
+
+        // if all checks passed, execute expel
+        await groupModel.expelMember({ group_id: req.body.group_id, user_id: req.body.delete_user_id }).catch(error => {
+            throw new Error ("500 " + error.message);
+        });
+
+        res.status(200).json("User expelled successfully");
+    } catch (error) {
+        errorHandler({ res: res, error: error });
+    }
+}
+
+// put user to blacklist: no comments & editing
+module.exports.blockUserLvl1_put = async (req, res) => {
+    try {
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        // check whether user has admin privilege
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error ("403 Can't perform block: not a group admin");
+        }
+        // check if user has been blocked by the group already
+        let isBlocked = await userModel.checkInBlackList({ group_id: req.body.group_id, user_id: req.body.user_id });
+        if (!isBlocked) {
+            throw new Error ("405 Can't perform block: user is blocked already");
+        }
+
+        await userModel.blockUser({ group_id: req.body.group_id, user_id: req.body.user_id, block_level: 1}).catch(error => {
+            throw new Error("500 " + error.message);
+        })
+
+        res.status(200).json("User has been blacklisted: not allowed to leave comments and edit your group's questions");
+    } catch (error) {
+        errorHandler({ res: res, error: error });
+    }
+}
+
+// put user to blacklist: no comments only
+module.exports.blockUserLvl2_put = async (req, res) => {
+    try {
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        // check whether user has admin privilege
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error ("403 Can't perform block: not a group admin");
+        }
+        // check if user has been blocked by the group already
+        let isBlocked = await userModel.checkInBlackList({ group_id: req.body.group_id, user_id: req.body.user_id });
+        if (!isBlocked) {
+            throw new Error ("405 Can't perform block: user is blocked already");
+        }
+
+        await userModel.blockUser({ group_id: req.body.group_id, user_id: req.body.user_id, block_level: 2}).catch(error => {
+            throw new Error("500 " + error.message);
+        })
+
+        res.status(200).json("User has been blacklisted: not allowed to leave comments under your group's questions");
+    } catch (error) {
+        errorHandler({ res: res, error: error });
+    }
+}
+
+// remove user from blacklist
+module.exports.unblockUser_put = async (req, res) => {
+    try {
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        // check whether user has admin privilege
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error ("403 Can't perform unblock: not a group admin");
+        }
+        // check if user is blocked by the group already
+        let isBlocked = await userModel.checkInBlackList({ group_id: req.body.group_id, user_id: req.body.user_id });
+        if (!isBlocked) {
+            throw new Error ("405 Can't perform unblock: user is unblocked already");
+        }
+
+        await userModel.unblockUser({ group_id: req.body.group_id, user_id: req.body.user_id}).catch(error => {
+            throw new Error("500 " + error.message);
+        })
+
+        res.status(200).json("User has been removed from blacklist");
+    } catch (error) {
+        errorHandler({ res: res, error: error });
+    }
+}
+
+module.exports.changeAdmin_put = async (req, res) => {
+    try {
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        // check whether user has admin privilege
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error ("403 Can't reassign admin: not a group admin");
+        }
+        // check if user has been blocked by the group
+        let isBlocked = await userModel.checkInBlackList({ group_id: req.body.group_id, user_id: req.body.user_id });
+        if (!isBlocked) {
+            throw new Error ("405 Can't reassign admin : user is blocked ");
+        }
+        // check whether user belongs to the group
+        let member_id = await groupModel.checkMembership({ group_id: req.body.group_id, user_id: req.body.user_id });
+        if (!member_id) {
+            throw new Error ("405 User isn't a group member");
+        }
+
+        // if everything is ok then update
+        await groupModel.assignAdmin({
+            group_id: req.body.group_id,
+            user_id: req.body.user_id
+        }).catch (error => {
+            throw new Error ("500 Can't reassign admin: " + error.message);
+        })
+
+        res.status(200).json("Group admin privilege was reassigned");
+    } catch (error) {
+        errorHandler({res: res, error: error});
+    }
+}
+
+module.exports.closeGroup_put = async (req, res) => {
+    try {
+        let admin_id = await groupModel.getGroupAdmin({ group_id: req.body.group_id });
+        // check whether user has admin privilege
+        if (req.user.user_id !== admin_id.group_admin) {
+            throw new Error ("403 Can't perform block: not a group admin");
+        }
+        // check whether group is opened
+        let group = await groupModel.getGroupById({ group_id: req.body.group_id });
+        if (!group) {
+            throw new Error("406 Group with given id doesn't exist");
+        }
+        if (group.is_closed !== 0) {
+            throw new Error("406 Group has been closed already");
+        }
+
+        await groupModel.closeGroup({ group_id: req.body.group_id }).catch(error => {
+            throw new Error("500 Can't close group: " + error.message);
+        });
+
+        res.status(200).json("Group has been closed successfully");
+    } catch (error) {
+        errorHandler({res: res, error: error});
+    }
+}

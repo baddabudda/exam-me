@@ -44,6 +44,16 @@ module.exports.assignToken = ({ group_id, access_token }) => {
     });
 }
 
+// check token
+module.exports.getToken = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT token FROM academgroups WHERE group_id = ?",
+        params: [group_id],
+        single: true
+    });
+}
+
 // get group by id
 module.exports.getGroupById = ({ group_id }) => {
     return executor.execute({
@@ -89,7 +99,7 @@ module.exports.checkPrivilege = ({ group_id, user_id }) => {
 module.exports.checkMembership = ({ group_id, user_id }) => {
     return executor.execute({
         query:
-            "SELECT COUNT(*) FROM users WHERE user_id = ? AND group_id = ?",
+            "SELECT * FROM users WHERE user_id = ? AND group_id = ?",
         params: [user_id, group_id],
         single: true
     });
@@ -102,5 +112,33 @@ module.exports.getAllGroupMembers = ({ group_id }) => {
             "SELECT * FROM users WHERE group_id = ?",
         params: [group_id],
         single: false
+    });
+}
+
+// expel group member
+module.exports.expelMember = ({ group_id, user_id }) => {
+    return executor.execute({
+        query:
+            "UPDATE users SET group_id = NULL WHERE group_id = ? AND user_id = ?",
+        params: [group_id, user_id],
+        sinle: true
+    });
+}
+
+module.exports.assignAdmin = ({ group_id, user_id }) => {
+    return executor.execute({
+        query: 
+            "UPDATE academgroups SET group_admin = ? WHERE group_id = ?",
+        params: [user_id, group_id],
+        single: true
+    });
+}
+
+module.exports.checkStatus = ({ group_id }) => {
+    return executor.execute({
+        query: 
+            "SELECT is_closed FROM academgroups WHERE group_id = ?",
+        params: [group_id],
+        single: true
     });
 }

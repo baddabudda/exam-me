@@ -4,17 +4,18 @@ const { pool } = require('../config/config.js');
 
 // check list accessibility
 module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
-    const res = executor.execute({
+    return executor.execute({
         query:
             "SELECT * FROM lists, users WHERE lists.list_id = ? AND lists.group_id = users.group_id AND users.group_id = ? AND users.user_id = ?",
         params: [list_id, group_id, user_id],
         single: true
     });
-    return(res)
+    
 }
 
 // check admin privilege for list
 module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
+    console.log(group_id, user_id, list_id)
     return executor.execute({
         query:
             "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id " +
@@ -25,25 +26,25 @@ module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
 }
 
 // check list accessibility
-module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
-    return executor.execute({
-        query:
-            "SELECT * FROM lists, users WHERE lists.list_id = ? AND lists.group_id = users.group_id AND users.group_id = ? AND users.user_id = ?",
-        params: [list_id, group_id, user_id],
-        single: true
-    });
-}
+// module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
+//     return executor.execute({
+//         query:
+//             "SELECT * FROM lists, users WHERE lists.list_id = ? AND lists.group_id = users.group_id AND users.group_id = ? AND users.user_id = ?",
+//         params: [list_id, group_id, user_id],
+//         single: true
+//     });
+// }
 
 // check admin privilege for list
-module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
-    return executor.execute({
-        query:
-            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id" +
-            "AND academgroups.group_id = ? AND academgroups.group_admin = ?",
-        params: [list_id, group_id, user_id],
-        single: true
-    });
-}
+// module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
+//     return executor.execute({
+//         query:
+//             "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id" +
+//             "AND academgroups.group_id = ? AND academgroups.group_admin = ?",
+//         params: [list_id, group_id, user_id],
+//         single: true
+//     });
+// }
 
 // getting list by list_id
 module.exports.getById = (listId => {
@@ -121,12 +122,52 @@ module.exports.checkPublic = ({ list_id }) => {
     });
 }
 
-// get lists by group
+// get all lists by group
 module.exports.getListsByGroup = ({ group_id }) => {
     return executor.execute({
         query:
             "SELECT * FROM lists WHERE group_id = ?",
         params: [group_id],
         single: false
+    });
+}
+
+// get group by list 
+module.exports.getListOwner = ({ list_id }) => {
+    return executor.execute({
+        query:
+            "SELECT group_id FROM lists WHERE list_id = ?",
+        params: [list_id],
+        single: true
+    });
+}
+
+// check relation list-group
+module.exports.checkListOwner = ({ list_id, group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM lists WHERE list_id = ? AND group_id = ?",
+        params: [list_id, group_id],
+        single: true
+    });
+}
+
+// add token
+module.exports.updateToken = ({ token, list_id, group_id }) => {
+    return executor.execute({
+        query:
+            "UPDATE lists SET token = ? WHERE list_id = ? AND group_id = ?",
+        params: [token, list_id, group_id],
+        single: true
+    });
+}
+
+// check token
+module.exports.checkToken = ({ list_id, group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT token FROM lists WHERE list_id = ? AND group_id = ?",
+        params: [list_id, group_id],
+        single: true
     });
 }
