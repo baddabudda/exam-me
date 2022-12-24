@@ -1,0 +1,298 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0", 
+      "title": "Exam_ME",
+      "description": "My User Project Application API",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "host": "localhost:3000",
+    "basePath": "/api",
+    "tags": [
+      {
+        "name": "subjects",
+        "description": "API for subjects"
+      },
+      {
+        "name": "lists",
+        "description": "API for lists"
+      }
+    ],
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+        "/subjects": {
+            "get": {
+                "tags": ["subjects"],
+                "summary": "Get all subjects",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Subjects"
+                        }
+                    },
+                    "500": {"message": "could not get subjects!"}
+                }
+            },
+            "post": {
+                "tags": ["subjects"],
+                "summary": "Create new subject",
+                "description": "Create new subject with given name. ",
+                "parameters": [{
+                        "name": "subject_name",
+                        "in": "body",
+                        "description": "new name, which is not in subjects",
+                        "schema": {
+                            "$ref": "#/definitions/updateSubject"
+                        }
+                    }
+                ],
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "New subject is created",
+                        "schema": {
+                            "$ref": "#/definitions/Subject"
+                        }
+                    },
+                    "409": { "message": "this subject name is already exist!"},
+                    "500": {"message": "could not create subject!"}
+                }
+            }
+        },
+        "/subjects/{subject_id}": {
+            "get": {
+                "tags": ["subjects"],
+                "summary": "Get subject by subject_id",
+                "parameters": [{
+                    "name": "subject_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "id of subject, which is needed to find",
+                    "type": "integer"
+                }],
+
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Subject"
+                        }
+                    },
+                    "500": {"message": "could not find subject!"}
+                }
+            },
+            "put": {
+                "summary": "Changing subject name by id",
+                "tags": ["subjects"],
+                "parameters": [{
+                    "name": "subject_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "id of subject, which name is needed to change",
+                    "type": "integer"
+                }, {
+                    "name": "subject_name",
+                    "in": "body",
+                    "required": true,
+                    "description": "new subject name",
+                    "schema": {
+                        "$ref": "#/definitions/updateSubject"
+                    }
+                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Subject"
+                        }
+                    },
+                    "500":{ "message": "could not change this subject!"},
+                    "400":{"message":"Maybe Duplicate entry for key 'subjects.UC_subjname. try again"},
+                    "404": {"message": "there is no such id!"}
+
+                }
+            }, "delete": {
+                "summary": "Deleting subject by its id",
+                "tags": ["subjects"],
+                "parameters": [{
+                    "name": "subject_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "subject id",
+                    "type": "integer"
+                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Subject"
+                        }
+                    },
+                    "500":{ "message": "could not delete this subject!"},
+                    "404": {"message": "there is no such id!"}
+
+                }
+
+            }
+
+        },
+        "/lists/public/{subject_id}":{
+            "get": {
+                "tags": ["lists"],
+                "summary": "Get all public lists by subject_id",
+                "parameters": [{
+                    "name": "subject_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "id of subject",
+                    "type": "integer"
+                }],
+
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Lists"
+                        }
+                    },
+                    "500": {"message": "could not find subject!"},
+                    "400": {"message": "list_id is not a number!"}
+                }
+            }
+        },
+        "/lists/{list_id}": {
+            "get": {
+                "tags": ["lists"],
+                "summary": "Get list by list_id",
+                "parameters": [{
+                    "name": "list_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "id of list, which is needed to find",
+                    "type": "integer"
+                }],
+
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/List"
+                        }
+                    },
+                    "500": {"message": "could not find subject!"},
+                    "400": {"message": "list_id is not a number!"}
+                }
+            }
+        }
+
+    },
+    "definitions": {
+        "Subject": {
+            "required": ["subject_name"],
+            "properties": {
+                "subject_id": {
+                    "type": "integer",
+                    "uniqueItems": true
+                },
+                "subject_name": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+            }
+        },
+        "Subjects": {
+            "type": "array",
+            "items":{ 
+                "$ref": "#/definitions/Subject"
+            }
+        },
+        "updateSubject":{
+            "required": ["subject_name"],
+            "properties":{
+                "subject_name": {
+                    "type": "string",
+                    "uniqueItems": true
+                }
+            }    
+        },
+        "List": {
+            "required": ["list_name", "group_id", "subject_id", "is_public", "semester"],
+            "properties": {
+                "list_id": {
+                    "type": "integer",
+                    "uniqueItems": true
+                },
+                "list_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "group_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "subject_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "subject_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "is_public":{
+                    "type": "boolean",
+                    "uniqueItems": false
+                },
+                "semester":{
+                    "type": "integer",
+                    "uniqueItems": false
+                }
+
+
+            }
+        },
+        "List_DTO": {
+            "required": ["list_name", "group_id", "subject_id", "is_public", "semester"],
+            "properties": {
+                "list_id": {
+                    "type": "integer",
+                    "uniqueItems": true
+                },
+                "list_name": {
+                    "type": "string",
+                    "uniqueItems": false
+                },
+                "group_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "subject_id":{
+                    "type": "integer",
+                    "uniqueItems": false
+                },
+                "is_public":{
+                    "type": "boolean",
+                    "uniqueItems": false
+                },
+                "semester":{
+                    "type": "integer",
+                    "uniqueItems": false
+                }
+
+
+            }},
+        "Lists": {
+            "type": "array",
+            "items":{ 
+                "$ref": "#/definitions/List"
+            }
+        }
+    }
+}

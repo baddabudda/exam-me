@@ -2,18 +2,19 @@ const { pool } = require('../config/config.js');
 
 // universal query function: both types of connections acceptable
 module.exports.execute = ({ connection, query, params, single}) => {
+    // console.log(query);
     // if outer connection isn't declared
-    if (typeof connection === 'undefined') {
+    if (connection === undefined) {
         return new Promise(async (resolve, reject) => {
-            let connection = undefined;
+            // let connection = undefined;
             try {
-                connection = await pool.promise().getConnection();
-                result = await connection.execute(query, params);
-                pool.releaseConnection(connection);
+                let connection = await pool.promise().getConnection();
+                let result = await connection.execute(query, params);
+                connection.release();
                 resolve(single ? result[0][0] : result[0]);
             } catch (error) {
-                console.error(error);
-                reject(new Error('Query cannot be executed'));
+                reject(error);
+                // reject(new Error('Query cannot be executed'));
             };
         });
     }
@@ -21,10 +22,10 @@ module.exports.execute = ({ connection, query, params, single}) => {
     // otherwise
     return new Promise(async (resolve, reject) => {
         try {
-            result = await connection.execute(query, params);
+            let result = await connection.execute(query, params);
             resolve(single ? result[0][0] : result[0]);
         } catch (error) {
-            console.error(error);
+            console.log(error)
             reject(new Error('Query cannot be executed'));
         };
     });   
@@ -33,11 +34,10 @@ module.exports.execute = ({ connection, query, params, single}) => {
 // call this function for queries which doesn't need external connection
 module.exports.executeNoConnection = ({ query, params, single }) => {
     return new Promise(async (resolve, reject) => {
-        let connection = undefined;
         try {
-            connection = await pool.promise().getConnection();
+            let connection = await pool.promise().getConnection();
             result = await connection.execute(query, params);
-            pool.releaseConnection(connection);
+            connection.release();
             resolve(single ? rs[0][0] : rs[0]);
         } catch (error) {
             console.error(error);

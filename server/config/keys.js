@@ -6,5 +6,8 @@ module.exports = {
     },
     session: {
         cookieKey: 'vfdx65iq7eowpzt'
+    },
+    webtoken: {
+        tokenKey: 'fdgoi12dfepzgxqn6'
     }
 }

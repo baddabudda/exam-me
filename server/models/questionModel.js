@@ -1,42 +1,42 @@
 const executor = require('./executor.js');
 
 // === QUESTION - LISTS requests ===
-module.exports.getQuestionsByListId = ({ listId }) => {
+module.exports.getAllQuestionsByListId = ({ list_id }) => {
     return executor.execute({
         query:
             "SELECT * FROM question WHERE list_id = ?",
-        params: [listId],
+        params: [list_id],
         single: false
     });
 };
 
 // === QUESTION inner requests ===
 module.exports.checkInDatabase = ({ questId, listId }) => {
-    return executor.execute({
+    let res = executor.execute({
         query:
             "SELECT * FROM question WHERE question_id = ? AND list_id = ? AND is_deleted = 0",
         params: [questId, listId],
-        single: true
+        single: false
     })
+    return res;
 }
 
-module.exports.checkOrder = ({ listId, order }) => {
-    return executor.execute({
-        query:
-            "SELECT * FROM question WHERE list_id = ? AND question_order = ?",
-        params: [listId, order],
-        single: true
-    });
-}
+// module.exports.checkOrder = ({ listId, order }) => {
+//     return executor.execute({
+//         query:
+//             "SELECT * FROM question WHERE list_id = ? AND question_order = ? AND is_deleted = 0",
+//         params: [listId, order],
+//         single: true
+//     });
+// }
 
-module.exports.createQuestion = ({ connection, listId, userId, date, order, title, body }) => {
+module.exports.createQuestion = ({ connection, listId, date, order, title, body }) => {
     return executor.execute({
         connection: connection,
         query:
-            "INSERT INTO question (list_id, user_id, edit_date, " +
-            "question_order, question_title, question_body, is_deleted) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-        params: [listId, userId, date, order, title, body, 0],
+            "INSERT INTO question (list_id, edit_date, question_order, question_title, question_body, is_deleted) " +
+            "VALUE (?, ?, ?, ?, ?, 0)",
+        params: [listId, date, order, title, body],
         single: true
     });
 }
@@ -81,6 +81,15 @@ module.exports.markDeleted = ({ connection, listId, questId }) => {
     });
 }
 
+module.exports.getQuestionById = ({ question_id, list_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM question WHERE question_id = ? AND list_id = ?",
+        params: [question_id, list_id],
+        single: true
+    });
+}
+
 // === VERSIONED inner requests ===
 module.exports.createVersion = ({ connection, date, listId, userId, questId, title, body }) => {
     return executor.execute({
@@ -95,17 +104,27 @@ module.exports.createVersion = ({ connection, date, listId, userId, questId, tit
     });
 }
 
+module.exports.checkVersion = ({ list_id, question_id, version_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM versioned WHERE version_id = ? AND question_id = ? AND list_id = ?",
+        params: [version_id, question_id, list_id],
+        single: true
+    });
+}
+
 // === QUESTION - VERSIONED requests ===
-module.exports.exportToVersion = ({ connection, questId }) => {
+
+module.exports.exportToVersion = ({ connection, question_id, user_id }) => {
     return executor.execute({
         connection: connection,
         query:
             "INSERT INTO versioned (edit_date, list_id, " +
             "user_id, question_id, question_title, " +
-            "question_body) SELECT edit_date, list_id, user_id, " +
+            "question_body) SELECT edit_date, list_id, ?, " +
             "question_id, question_title, question_body FROM question " +
             "WHERE question_id = ?",
-        params: [questId],
+        params: [user_id, question_id],
         single: true
     });
 }
@@ -119,10 +138,23 @@ module.exports.getVersionsByQuestionId = ({ questId }) => {
     });
 }
 
-module.exports.updateFromVersion = ({ connection, questId }) => {
+module.exports.updateFromVersion = ({ connection, edit_date, version_id }) => {
     return executor.execute({
         connection: connection,
         query: 
-            "UPDATE question SET "
-    })
+            "UPDATE question INNER JOIN versioned ON (question.question_id = versioned.question_id) " +
+            "SET question.question_title = versioned.question_title, question.question_body = versioned.question_body, " +
+            "question.edit_date = ?, question.is_deleted = 0 WHERE versioned.version_id = ?",
+        params: [edit_date, version_id],
+        single: true
+    });
+}
+
+module.exports.checkAccess = ({ user_group_id, user_id, group_host_id, list_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM (SELECT * FROM users WHERE users.group_id = ? AND users.user_id = ?) AS t1 UNION (SELECT users.* FROM users, invite WHERE invite.group_host_id = ? AND invite.list_id = ? AND invite.group_guest_id = users.group_id AND users.user_id = ?)",
+        params: [user_group_id, user_id, group_host_id, list_id, user_id],
+        single: false
+    });
 }

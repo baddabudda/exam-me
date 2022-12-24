@@ -1,0 +1,44 @@
+<div class="tui-container tui-container_adaptive">
+    <div class="tui-row tui-row_adaptive">
+        <div class="tui-col_lg-7 tui-col_md-7 tui-col_xs-12">
+            <h2>Мой аккаунт</h2>
+            <div class="user_info" *ngIf="user">
+                <h3 class="nomg">Личная информация</h3>
+                <div class="info_row">
+                    <span class="info_name">Фамилия</span>
+                    <span class="info_value">{{user.user_lname}}</span>
+                </div>
+                <div class="info_row">
+                    <span class="info_name">Имя</span>
+                    <span class="info_value">{{user.user_fname}}</span>
+                </div>
+                <div class="info_row">
+                    <span class="info_name">Отчество</span>
+                    <span class="info_value">{{user.user_pname}}</span>
+                </div>
+                <h3>Информация об аккаунте</h3>
+                <div class="info_row">
+                    <span class="info_name">Группа</span>
+                    <span class="info_value">{{getGroupName()}}</span>
+                </div>
+                <h3>Дополнительные сведения</h3>
+                <div class="info_row">
+                    <span class="info_name">Пользовательская роль</span>
+                    <span class="info_value">{{getRole()}}</span>
+                </div>
+            </div>
+            <br>
+            <button tuiButton size="s" appearance="primary" (click)="logout()">Выйти из аккаунта</button>
+        </div>
+        <div class="tui-col_lg-5 tui-col_md-5 tui-col_xs-12">
+            <div class="faq">
+                <h4>Часто задаваемые вопросы</h4>
+                <h5>Как создать свою академическую группу?</h5>
+                <p class="answer">Нажмите на кнопку "Моя группа", перейдите в раздел создания, а затем заполните всю необходимую информацию и подтвердите создание. Важно! По умолчанию создатель группы является старостой.</p>
+                <h5>Как присоединиться к академической группе?</h5>
+                <p class="answer">Обратитесь к старосте своей группы за ссылкой на присоединение к группе. После авторизации перейдите по ссылке. Вуаля! Вы в группе. Воспользоваться ссылкой можно в течении 5 часов после создания.</p>
+                
+            </div>
+        </div>
+    </div>
+</div>

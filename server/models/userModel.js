@@ -1,6 +1,6 @@
 const executor = require('./executor.js');
-// const pool = require('../config/config.js');
 
+// get user by vk_id
 module.exports.getUserByVkId = ({ vk_id }) => {
     return executor.execute({
         query:
@@ -10,84 +10,106 @@ module.exports.getUserByVkId = ({ vk_id }) => {
     });
 }
 
-module.exports.getUserById = ({ db_id }) => {
-    console.log(db_id);
+// get user by id = database id
+module.exports.getUserById = ({ user_id }) => {
+    // console.log(id);
     return executor.execute({
         query:
             "SELECT * FROM users WHERE user_id = ?",
-        params: [db_id],
+        params: [user_id],
         single: true
     });
 }
 
+// create new user in passport-setup callback function
 module.exports.createUser = ({ vk_id, fname, lname }) => {
     return executor.execute({
         query:
-            "INSERT INTO users (vk_id, user_fname, user_lname) " +
-            "VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO users (vk_id, user_fname, user_lname, status) " +
+            "VALUES (?, ?, ?, 0)",
         params: [vk_id, fname, lname],
         single: true
     });
 }
 
-// createUser = ({ login, password, email, fname, lname, pname }) => {
-//     return executor.queryExecute({
-//         query:
-//             "INSERT INTO users (user_login, password_hash, " +
-//             "user_email, user_fname, user_lname, user_pname) " +
-//             "VALUES (?, ?, ?, ?, ?, ?)",
-//         params: [login, md5(password), email, fname, lname, pname],
-//         single: true
-//     });
-// }
-
-editUser = ({ login, email, fname, lname, pname, id }) => {
-    return executor.queryExecute({
+// edit user info in profile
+module.exports.editUser = ({ user_id, fname, lname, pname }) => {
+    return executor.execute({
         query: 
-            "UPDATE users SET user_login = ?, user_email = ?, " +
-            "user_fname = ?, user_lname = ?, user_pname = ? " +
-            "WHERE user_id = ?",
-        params: [login, email, fname, lname, pname, id],
+            "UPDATE users SET user_fname = ?, user_lname = ?, user_pname = ? WHERE user_id = ?",
+        params: [fname, lname, pname, user_id],
         single: true
     });
 }
 
-deleteUserByLogin = ({ login }) => {
-    return executor.queryExecute({
+// change status (for registration purposes)
+module.exports.changeStatus = ({ user_id }) => {
+    return executor.execute({
         query:
-            "DELETE FROM users WHERE user_login = ?",
-        params: [login],
+            "UPDATE users SET status = 1 WHERE user_id = ?",
+        params: [user_id],
         single: true
     });
 }
 
-deleteUserById = ({ id }) => {
-    return executor.queryExecute({
+// join group
+module.exports.joinGroup = ({ connection, user_id, group_id }) => {
+    return executor.execute({
+        connection: connection,
         query:
-            "DELETE FROM users WHERE user_id = ?",
-            params: [id],
-            single: true
-    })
-}
-
-getUserById = ({ id }) => {
-    return executor.queryExecute({
-        query:
-            "SELECT user_id, group_id, user_login, user_email, " +
-            "user_fname, user_lname, user_pname FROM users " +
-            "WHERE user_id = ?",
-        params: [id],
+            "UPDATE users SET group_id = ? WHERE user_id = ?",
+        params: [group_id, user_id],
         single: true
     });
 }
 
-getUserByLogin = ({ login }) => {
-    return executor.queryExecute({
-        query: 
-            "SELECT user_id, group_id, user_login, user_email, " +
-            "user_fname, user_lname, user_pname FROM users " +
-            "WHERE user_login = ?",
-        params: [login],
+// leave group
+module.exports.leaveGroup = ({ user_id }) => {
+    return executor.execute({
+        query:
+            "UPDATE users SET group_id = NULL WHERE user_id = ?",
+        params: [user_id],
+        single: true
+    });
+}
+
+// get group members
+module.exports.getGroupMembers = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM users WHERE group_id = ?",
+        params: [group_id],
+        single: false
+    });
+}
+
+// block user: lvl 1 - no edit mode, 2 - no edit/comment
+module.exports.blockUser = ({ group_id, user_id, block_level }) => {
+    return executor.execute({
+        query:
+            "INSERT INTO blacklist (user_id, group_id, block_level) VALUES (?, ?, ?)",
+        params: [user_id, group_id, block_level],
+        single: true
+    });
+}
+
+// unblock user
+module.exports.unblockUser = ({ group_id, user_id }) => {
+    return executor.execute({
+        query:
+            "DELETE FROM blacklist WHERE group_id = ? AND user_id = ?",
+        params: [group_id, user_id],
+        single: true
+    });
+}
+
+// сheck in blacklist
+module.exports.checkInBlackList = ({ group_id, user_id }) => {
+    console.log({ group_id, user_id });
+    return executor.execute({
+        query:
+            "SELECT block_level FROM blacklist WHERE group_id = ? AND user_id = ?",
+        params: [group_id, user_id],
         single: true
     });
 }

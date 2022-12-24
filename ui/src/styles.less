@@ -1,0 +1,35 @@
+@import '~@taiga-ui/core/styles/taiga-ui-theme';
+@import '~@taiga-ui/core/styles/taiga-ui-fonts';
+@import '~@taiga-ui/styles/taiga-ui-global';
+ 
+@background : #ECECEC;
+@button : #09151B;
+
+body{
+    background: @background;
+    padding: 0;
+    margin: 0;
+}
+
+.layout{
+    min-height: 100vh;
+}
+.grey{
+    color: var(--tui-text-02) !important;
+}
+.green{
+    color: var(--tui-primary-hover) !important;
+}
+.headig_card{
+    letter-spacing: 0.05em;
+    font-family: 'Roboto';
+    color: #09151B;
+    margin: 0;
+    margin-bottom: 0.5em;
+    
+}
+.hideOnMobile{
+    @media @tui-mobile{
+        display: none !important;
+    }
+}
