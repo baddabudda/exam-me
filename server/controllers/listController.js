@@ -83,26 +83,28 @@ module.exports.getPublicBySubjectId_get = async (req, res) => {
 // creating new list
 module.exports.createList_post = async (req, res) => {
     try {
-        const listOwner_id = await listModel.getListOwner({ list_id: req.body.list_id });
+        const listOwner = await listModel.getListOwner_bygrid({ group_id: req.body.group_id });
         // check is_closed
-        if (listOwner_id.is_closed) {
+        if (listOwner.is_closed) {
             throw new Error("403 Access denied: group has been closed");
         }
         // check group membership
         if (!req.user.group_id) {
             throw new Error ("Can't create new list: user isn't a member of any group");
         }
+        
         // check admin privilege to create list: we automatically check group-list connection
         let admin = await groupModel.checkPrivilege({ group_id: req.params.groupid, user_id: req.user.user_id });
         if (!admin) {
             throw new Error ("Can't create new list: user doesn't have admin privilege");
         }
+        
         // check contents
         let content = checkContents(req.body);
         if (!content.pass) {
             throw new Error("Can't create new list: check form for emptiness");
         }
-
+        
         // if everything is ok, create new list
         const result = await listModel.createList({
             group_id: req.user.group_id,
@@ -111,6 +113,7 @@ module.exports.createList_post = async (req, res) => {
             is_public: req.body.is_public,
             semester: req.body.semester
         });
+        
         res.status(200).json({id: result.insertId});
     } catch (error) {
         errorHandler({ res: res, code: 500, error: error.message });
@@ -135,6 +138,7 @@ module.exports.publishList_post = async (req, res) => {
         await listModel.publishList({ list_id: req.params.listid });
         res.status(200).json();
     } catch (error) {
+        console.log(error);
         errorHandler({ res: res, code: 500, error: error.message });
     }
 }

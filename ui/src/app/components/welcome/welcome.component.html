@@ -69,7 +69,7 @@ style="text-align: center;">
        class="subjectButton"
        appearance="secondary" 
        *ngFor="let question of findQuestions"
-       routerLink="/list/{{question.list_id}}/question/{{question.question_id}}"
+       routerLink="/list/{{question.list_id}}/{{question.question_id}}"
        [queryParams]="{public: true}"
        size="s">
        {{question.question_title}}</a>

@@ -31,11 +31,10 @@ module.exports.checkInDatabase = ({ questId, listId }) => {
 // }
 
 module.exports.createQuestion = ({ connection, listId, date, order, title, body }) => {
-    console.log(listId, userId, date, order, title, body)
     return executor.execute({
         connection: connection,
         query:
-            "INSERT INTO question (list_id, user_id, edit_date, question_order, question_title, question_body, is_deleted) " +
+            "INSERT INTO question (list_id, edit_date, question_order, question_title, question_body, is_deleted) " +
             "VALUE (?, ?, ?, ?, ?, 0)",
         params: [listId, date, order, title, body],
         single: true
@@ -154,9 +153,7 @@ module.exports.updateFromVersion = ({ connection, edit_date, version_id }) => {
 module.exports.checkAccess = ({ user_group_id, user_id, group_host_id, list_id }) => {
     return executor.execute({
         query:
-            "SELECT * FROM (SELECT * FROM users WHERE users.group_id = ? AND users.user_id = ?) " +
-            "UNION (SELECT users.* FROM users, invite WHERE invite.group_host_id = ? AND invite.list_id = ? " +
-            "AND invite.group_guest_id = users.group_id AND users.user_id = ?)",
+            "SELECT * FROM (SELECT * FROM users WHERE users.group_id = ? AND users.user_id = ?) AS t1 UNION (SELECT users.* FROM users, invite WHERE invite.group_host_id = ? AND invite.list_id = ? AND invite.group_guest_id = users.group_id AND users.user_id = ?)",
         params: [user_group_id, user_id, group_host_id, list_id, user_id],
         single: false
     });

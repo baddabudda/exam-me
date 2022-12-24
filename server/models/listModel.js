@@ -129,6 +129,14 @@ module.exports.getListOwner = ({ list_id }) => {
         single: true
     });
 }
+module.exports.getListOwner_bygrid = ({ group_id }) => {
+    return executor.execute({
+        query:
+            "SELECT * FROM academgroups WHERE group_id = ?",
+        params: [group_id],
+        single: true
+    });
+}
 
 // check relation list-group
 module.exports.checkListOwner = ({ list_id, group_id }) => {

@@ -14,12 +14,12 @@ router.get('/public/:listid', listController.getListById);
 router.get('/public/:listid/all', questionController.getPublicQuestions_get);
 // get access to private group list
 
-router.use('/:listid', questionRouter);
-router.use('/public/:listid/', questionRouter);
 
 router.post('/:groupid/create-list', authHandler, listController.createList_post);
 router.put('/:groupid/:listid/publish', authHandler, listController.publishList_post);
 
+router.use('/:listid', questionRouter);
+router.use('/public/:listid/', questionRouter);
 // router.post('/:listid/create', authHandler, questionController.createQuestion_post);
 
 module.exports = router;

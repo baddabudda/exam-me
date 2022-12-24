@@ -1,7 +1,7 @@
 module.exports = ({ res, error }) => {
     let default_code = 500;
     let custom_code = undefined;
-    if (error.message) {
+    if (error?.message) {
         custom_code = parseInt(error.message.slice(0,3))
     }
     

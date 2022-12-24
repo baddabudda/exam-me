@@ -87,6 +87,7 @@ module.exports.getQuestion_get = async (req, res) => {
 // POST-request for creating question
 module.exports.createQuestion_post = async (req, res) => {
     try {
+        console.log(req.body);
         const listOwner_id = await listModel.getListOwner({ list_id: req.body.list_id });
         // check is_closed
         if (listOwner_id.is_closed) {
@@ -99,7 +100,7 @@ module.exports.createQuestion_post = async (req, res) => {
         }
         // check user blacklist status
         let block_level = await userModel.checkInBlackList({ group_id: listOwner_id.group_id, user_id: req.user.user_id });
-        if (block_level.block_level === 1) {
+        if (block_level?.block_level === 1) {
             throw new Error ("403 Blacklist level 1: can't create question");
         }
         // check whether question with such order exists
@@ -192,6 +193,12 @@ module.exports.editQuestion_put = async (req, res) => {
         if (listOwner_id.is_closed) {
             throw new Error("403 Access denied: group has been closed")
         }
+        console.log({
+            user_group_id: req.user.group_id,
+            user_id: req.user.user_id,
+            group_host_id: listOwner_id.group_id,
+            list_id: req.body.list_id
+        });
         // check user access
         let access = undefined;
         access = await questionModel.checkAccess({
@@ -203,9 +210,10 @@ module.exports.editQuestion_put = async (req, res) => {
         if (!access) {
             throw new Error ("403 Access denied: no membership to edit question");
         }
+
         // check user blacklist status
         let block_level = await userModel.checkInBlackList({ group_id: listOwner_id.group_id, user_id: req.user.user_id });
-        if (block_level.block_level === 1) {
+        if (block_level && block_level.block_level === 1) {
             throw new Error ("403 Blacklist level 1: can't edit question");
         }
         // check whether question with passed id exits in database
@@ -218,6 +226,7 @@ module.exports.editQuestion_put = async (req, res) => {
             res.status(204).json({ success: true, message: 'Question with such id not found' });
             return;
         }
+        console.log('nen');
 
         // check whether question with such order exists
         // let orderCheck = await questionModel.checkOrder({
@@ -239,6 +248,7 @@ module.exports.editQuestion_put = async (req, res) => {
             res.status(204).json({ success: true, message: checkContent.errors });
             return;
         }
+        console.log('nen');
         // try to establish connection + make transaction
         let connection = undefined;
 
