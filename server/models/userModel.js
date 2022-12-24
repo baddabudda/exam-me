@@ -12,7 +12,6 @@ module.exports.getUserByVkId = ({ vk_id }) => {
 
 // get user by id = database id
 module.exports.getUserById = ({ user_id }) => {
-    // console.log(id);
     return executor.execute({
         query:
             "SELECT * FROM users WHERE user_id = ?",
@@ -105,7 +104,6 @@ module.exports.unblockUser = ({ group_id, user_id }) => {
 
 // сheck in blacklist
 module.exports.checkInBlackList = ({ group_id, user_id }) => {
-    console.log({ group_id, user_id });
     return executor.execute({
         query:
             "SELECT block_level FROM blacklist WHERE group_id = ? AND user_id = ?",

@@ -69,7 +69,6 @@ module.exports.getSubjectById = async (req, res) => {
 module.exports.putSubjectById = async (req, res) => {
     try {
         const subject = await subject_modele.putSubjectById (req.params.subject_id, req.body.subject_name);
-        console.log(subject);
         if(subject==0){
             throw{code: 404, message: 'there is no such id!'}
         }

@@ -16,8 +16,6 @@ import { AnswerComponent } from "./components/answer/answer.component";
 import { ToolbarComponent } from "./components/toolbar/toolbar.component";
 import { LoginComponent } from "./components/login/login.component";
 import { HttpClientModule } from "@angular/common/http";
-
-import { CookieModule } from 'ngx-cookie';
 import { GroupComponent } from "./components/group/group.component";
 import { ProfileComponent } from "./components/profile/profile.component";
 import { JoinComponent } from "./components/join.component";
@@ -46,8 +44,7 @@ import { JoinComponent } from "./components/join.component";
     TaigaModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
-    CookieModule.withOptions()
+    HttpClientModule, 
 ],
   providers: [{provide: TUI_SANITIZER, useClass: NgDompurifySanitizer}],
   bootstrap: [AppComponent]

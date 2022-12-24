@@ -7,16 +7,13 @@ const userModel = require('../models/userModel.js');
 // === (DE)SERIALIATION ===
 // which data of user must be stored in the session
 passport.serializeUser((user, done) => {
-    // console.log('serializing');
     done(null, user.user_id);
  });
  
  // attaches user object to req.user
  passport.deserializeUser((id, done) => {
-    // console.log(db_id);
     userModel.getUserById({ user_id: id })
     .then(currentUser => {
-        // console.log(currentUser);
         done(null, currentUser);
     }).
     catch (err => {
@@ -36,7 +33,6 @@ passport.serializeUser((user, done) => {
          }, async (req, accessToken, refreshToken, params, profile, done) => {
             // check whether user with such vk_id exists in database
             let user = await userModel.getUserByVkId({ vk_id: profile._json.id });
-            // console.log(user);
             if (!user){
                 await userModel.createUser({
                     vk_id: profile._json.id,
@@ -46,7 +42,6 @@ passport.serializeUser((user, done) => {
 
                 user = await userModel.getUserByVkId({ vk_id: profile._json.id });
             }
-            // console.log(user);
 
             // pass user during authorization
             done(null, user);

@@ -24,7 +24,6 @@ const verifyToken = (token) => {
 module.exports.profile_get = async (req, res) => {
     if (req.user) {
         if (!req.user.status) {
-            // console.log('here!');
             await userModel.changeStatus({user_id: req.user.user_id});
         }
         res.status(200).json({ success: true, message: "Profile-GET is successful", user: req.user });

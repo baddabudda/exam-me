@@ -17,7 +17,7 @@ export class AppComponent {
     router.events.subscribe(ev=>{if(ev instanceof NavigationEnd) window.scrollTo(0, 0)})
   }
   delete(){
-    return this.http.delete(`${HOST}/api/subjects/16`).subscribe(console.log)
+    return this.http.delete(`${HOST}/api/subjects/16`).subscribe()
   }
 
 }

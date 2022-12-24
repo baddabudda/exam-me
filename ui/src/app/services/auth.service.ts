@@ -3,7 +3,6 @@ import { BehaviorSubject, filter, tap } from 'rxjs';
 import { user } from '../interfaces/interfaces';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { HOST } from 'src/config';
-import { CookieService } from 'ngx-cookie';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {

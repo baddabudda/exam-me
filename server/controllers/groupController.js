@@ -85,7 +85,6 @@ module.exports.groupInfo_get = async (req, res) => {
         if (!await groupModel.getGroupById({ group_id: group_id })){
             throw new Error("406 Group with given id not found");
         }
-        // console.log(req.user);
         if (req.user.group_id !== group_id){
             throw new Error("403 Access denied: not a member");
         }

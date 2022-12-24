@@ -87,7 +87,6 @@ module.exports.getQuestion_get = async (req, res) => {
 // POST-request for creating question
 module.exports.createQuestion_post = async (req, res) => {
     try {
-        console.log(req.body);
         const listOwner_id = await listModel.getListOwner({ list_id: req.body.list_id });
         // check is_closed
         if (listOwner_id.is_closed) {
@@ -103,16 +102,6 @@ module.exports.createQuestion_post = async (req, res) => {
         if (block_level?.block_level === 1) {
             throw new Error ("403 Blacklist level 1: can't create question");
         }
-        // check whether question with such order exists
-        // console.log(req.body.question_order)
-        // let orderCheck = await questionModel.checkOrder({
-        //     listId: req.body.list_id,
-        //     order: req.body.question_order
-        // });
-        // if (orderCheck && orderCheck.length) {
-        //     res.status(204).json({ success: true, message: 'Question with such order already exists' });
-        //     return;
-        // }
         // check contents of question: order, title, body whether they are not empty and order is number
         let content = checkContents({order: req.body.question_order, title: req.body.question_title , body: req.body.question_body});
         if (!content.pass) {
@@ -131,7 +120,6 @@ module.exports.createQuestion_post = async (req, res) => {
                 await connection.beginTransaction();
                 await connection.query("LOCK TABLES question WRITE, versioned WRITE");
 
-                // console.log('hi')
                 // make queries
                 let timeElapsed = Date.now();
                 let date = new Date(timeElapsed);
@@ -193,12 +181,6 @@ module.exports.editQuestion_put = async (req, res) => {
         if (listOwner_id.is_closed) {
             throw new Error("403 Access denied: group has been closed")
         }
-        console.log({
-            user_group_id: req.user.group_id,
-            user_id: req.user.user_id,
-            group_host_id: listOwner_id.group_id,
-            list_id: req.body.list_id
-        });
         // check user access
         let access = undefined;
         access = await questionModel.checkAccess({
@@ -226,20 +208,6 @@ module.exports.editQuestion_put = async (req, res) => {
             res.status(204).json({ success: true, message: 'Question with such id not found' });
             return;
         }
-        console.log('nen');
-
-        // check whether question with such order exists
-        // let orderCheck = await questionModel.checkOrder({
-        //     listId: req.body.list_id,
-        //     order: req.body.question_order
-        // });
-        // if (orderCheck && orderCheck.question_id !== parseInt(req.body.question_id)) {
-        //     console.log('Question with such order already exists');
-        // }
-        // if (orderCheck) {
-        //     res.status(204).json({ success: true, message: 'Question with such order already exists' });
-        //     return;
-        // }
 
         // check contents of question: order, title, body whether they are not empty and order is number
         
@@ -248,7 +216,6 @@ module.exports.editQuestion_put = async (req, res) => {
             res.status(204).json({ success: true, message: checkContent.errors });
             return;
         }
-        console.log('nen');
         // try to establish connection + make transaction
         let connection = undefined;
 
@@ -423,7 +390,6 @@ module.exports.changeOrder_post = async (req, res) => {
                     throw new Error('Question with such id is not found');
                 }
             }
-            console.log('neen');
 
             // await connection.query("UNLOCK TABLES");
             // the end of transaction: commit changes and release connection {id: order, id: order, id: order}
@@ -449,11 +415,9 @@ module.exports.getVersions_get = async (req, res) => {
         let baseUrl = req.baseUrl.split('/')
         listid = baseUrl[baseUrl.length-1]
         
-        // console.log(req.params.listid);
         if (!(await questionModel.checkInDatabase({ questId: req.params.questionid, listId: listid }))) {
             throw new Error ("500 Question not found");
         }
-        console.log('checked in')
         // check admin privilege
         if (!(await listModel.checkListPrivilege({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: listid }))) {
             throw new Error ("403 Access denied: no membership to view versions");
@@ -516,7 +480,6 @@ module.exports.chooseVersion_put = async (req, res) => {
                     user_id: req.user.user_id
                 });
                 
-                console.log('checkExistence')
                 // the end of transaction: commit changes and release connection
                 await connection.commit();
                 connection.release();
