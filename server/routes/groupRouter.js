@@ -17,5 +17,7 @@ router.post('/create', authHandler, groupController.createGroup_post);
 router.put('/:groupid/edit', authHandler, groupController.editGroup_put);
 // exam.me/group/123/invite
 router.get('/:groupid/invite', authHandler, groupController.generateInvitation_get);
+// exam.me/group/123/expel
+router.put('/:groupid/expel', authHandler, groupController.expelMember_put); // OK, tested
 
 module.exports = router;
