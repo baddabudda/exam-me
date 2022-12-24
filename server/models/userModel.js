@@ -82,32 +82,32 @@ module.exports.getGroupMembers = ({ group_id }) => {
     });
 }
 
-// block user: lvl 1 - no edit mode, 2 - no edit/comment
-module.exports.blockUser = ({ group_id, user_id, block_level }) => {
-    return executor.execute({
-        query:
-            "INSERT INTO blacklist (user_id, group_id, block_level) VALUES (?, ?, ?)",
-        params: [user_id, group_id, block_level],
-        single: true
-    });
-}
+// // block user: lvl 1 - no edit mode, 2 - no edit/comment
+// module.exports.blockUser = ({ group_id, user_id, block_level }) => {
+//     return executor.execute({
+//         query:
+//             "INSERT INTO blacklist (user_id, group_id, block_level) VALUES (?, ?, ?)",
+//         params: [user_id, group_id, block_level],
+//         single: true
+//     });
+// }
 
 // unblock user
-module.exports.unblockUser = ({ group_id, user_id }) => {
-    return executor.execute({
-        query:
-            "DELETE FROM blacklist WHERE group_id = ? AND user_id = ?",
-        params: [group_id, user_id],
-        single: true
-    });
-}
+// module.exports.unblockUser = ({ group_id, user_id }) => {
+//     return executor.execute({
+//         query:
+//             "DELETE FROM blacklist WHERE group_id = ? AND user_id = ?",
+//         params: [group_id, user_id],
+//         single: true
+//     });
+// }
 
 // сheck in blacklist
-module.exports.checkInBlackList = ({ group_id, user_id }) => {
-    return executor.execute({
-        query:
-            "SELECT block_level FROM blacklist WHERE group_id = ? AND user_id = ?",
-        params: [group_id, user_id],
-        single: true
-    });
-}
+// module.exports.checkInBlackList = ({ group_id, user_id }) => {
+//     return executor.execute({
+//         query:
+//             "SELECT block_level FROM blacklist WHERE group_id = ? AND user_id = ?",
+//         params: [group_id, user_id],
+//         single: true
+//     });
+// }

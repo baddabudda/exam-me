@@ -150,11 +150,11 @@ module.exports.updateFromVersion = ({ connection, edit_date, version_id }) => {
     });
 }
 
-module.exports.checkAccess = ({ user_group_id, user_id, group_host_id, list_id }) => {
+module.exports.checkAccess = ({user_id, group_host_id}) => {
     return executor.execute({
         query:
-            "SELECT * FROM (SELECT * FROM users WHERE users.group_id = ? AND users.user_id = ?) AS t1 UNION (SELECT users.* FROM users, invite WHERE invite.group_host_id = ? AND invite.list_id = ? AND invite.group_guest_id = users.group_id AND users.user_id = ?)",
-        params: [user_group_id, user_id, group_host_id, list_id, user_id],
+            "SELECT * FROM users WHERE users.group_id = ? AND users.user_id = ?",
+        params: [group_host_id, user_id],
         single: false
     });
 }

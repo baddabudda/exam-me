@@ -10,6 +10,7 @@ export class GroupService {
     constructor(private httpClient: HttpClient, private auth: AuthService) { }
 
     getGroup(){
+        
         return this.auth.currentUser.pipe(switchMap(user => {
             if(!user) return throwError(() => "Unauthorized");
             return this.httpClient.get<Group>(`${HOST}/api/group/${user.group_id}`, getHttpOptions())

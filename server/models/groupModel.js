@@ -7,8 +7,8 @@ module.exports.createGroup = ({ connection, faculty_id, program_id, admin_id, gr
         connection: connection,
         query:
             "INSERT INTO academgroups (faculty_id, program_id, group_admin, " +
-            "group_name, course, is_closed) " +
-            "VALUES (?, ?, ?, ?, ?, 0)",
+            "group_name, course) " +
+            "VALUES (?, ?, ?, ?, ?)",
         params: [faculty_id, program_id, admin_id, group_name, course],
         single: true
     });
@@ -134,11 +134,11 @@ module.exports.assignAdmin = ({ group_id, user_id }) => {
     });
 }
 
-module.exports.checkStatus = ({ group_id }) => {
-    return executor.execute({
-        query: 
-            "SELECT is_closed FROM academgroups WHERE group_id = ?",
-        params: [group_id],
-        single: true
-    });
-}
+// module.exports.checkStatus = ({ group_id }) => {
+//     return executor.execute({
+//         query: 
+//             "SELECT is_closed FROM academgroups WHERE group_id = ?",
+//         params: [group_id],
+//         single: true
+//     });
+// }

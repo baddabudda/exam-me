@@ -23,7 +23,7 @@ export class ProfileComponent implements OnInit {
     ) { 
         auth.currentUser.pipe(
             tap(user => this.user = user ? user : undefined),
-            concatMap(user => groupService.getGroup())
+            concatMap(user =>  groupService.getGroup())
         ).subscribe(group => this.group = group);
     }
 
@@ -33,6 +33,7 @@ export class ProfileComponent implements OnInit {
         return this.group ? this.group.group_name : 'Unknown'
     }
     getRole(){
+        if(!this.group)return undefined;
         const admin = (this.group && this.user) && this.group.group_admin == this.user.user_id;
         return `${admin ? "Староста" : "Участник"} группы`
     }

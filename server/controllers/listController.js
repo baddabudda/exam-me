@@ -85,9 +85,9 @@ module.exports.createList_post = async (req, res) => {
     try {
         const listOwner = await listModel.getListOwner_bygrid({ group_id: req.body.group_id });
         // check is_closed
-        if (listOwner.is_closed) {
-            throw new Error("403 Access denied: group has been closed");
-        }
+        // if (listOwner.is_closed) {
+        //     throw new Error("403 Access denied: group has been closed");
+        // }
         // check group membership
         if (!req.user.group_id) {
             throw new Error ("Can't create new list: user isn't a member of any group");
