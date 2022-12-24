@@ -12,6 +12,15 @@ module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
     });
     
 }
+module.exports.checPub = (list_id ) => {
+    return executor.execute({
+        query:
+            "SELECT is_public FROM lists WHERE lists.list_id = ?",
+        params: [list_id],
+        single: true
+    });
+    
+}
 
 // check list accessibility
 // module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {

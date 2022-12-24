@@ -35,12 +35,15 @@ const checkContents = (contents) => {
 // GET-request for getting all questions from list
 module.exports.getAllQuestions_get = async (req, res) => {
     try {
+
         let baseUrl = req.baseUrl.split('/')
         listid = baseUrl[baseUrl.length-1]
-        if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: listid  })) {
-            throw new Error ("403 Access denied: no membership to view questions");
-        }
 
+        if(!await listModel.checPub(listid)){
+            if (!await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: listid  })) {
+                throw new Error ("403 Access denied: no membership to view questions");
+            }
+        }
         let questions = await questionModel.getAllQuestionsByListId({ list_id: listid  });
         res.status(200).json(questions);
     } catch (error) {
@@ -69,9 +72,10 @@ module.exports.getQuestion_get = async (req, res) => {
         listid = baseUrl[baseUrl.length-1]
         
         // check access to list
+        if(!await listModel.checPub(listid)){
         if (!(await listModel.checkListAccess({ group_id: req.user.group_id, user_id: req.user.user_id, list_id: listid }))) {
             throw new Error ("403 Access denied: no membership to view question");
-        }
+        }}
         
         let question = await questionModel.getQuestionById({ question_id: req.params.questionid, list_id: listid });
         if (!question) {

@@ -11,7 +11,7 @@ router.get('/public/subject/:subjectid', listController.getPublicBySubjectId_get
 // access questions of public list
 router.get('/:listid', authHandler ,listController.getListById);
 router.get('/public/:listid', listController.getListById);
-router.get('/public/:listid/all', questionController.getPublicQuestions_get);
+// router.get('/public/:listid/all', questionController.getPublicQuestions_get);
 // get access to private group list
 
 

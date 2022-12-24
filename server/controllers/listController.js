@@ -145,14 +145,20 @@ module.exports.publishList_post = async (req, res) => {
 
 // get list by id
 module.exports.getListById = async (req, res) => {
+    
     try{
+        
         const list_id = req.params.listid;
         if (!isNan(parseInt(list_id))){
+            console.log('req.params.listid')
+            console.log(req.params.listid)
+
             const currentList = await listModel.getById(list_id);
             res.status(200).json( currentList );
         } else {
             throw {code: 400, message: 'list_id is not a number!'};
         }
+        
     } catch (err) {
         errorHandler({res: res, code: 500, err: err});
     }
