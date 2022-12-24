@@ -25,7 +25,7 @@ Exam.me
   - [Исключение участника из группы](#10-исключение-участника-из-группы)
 - [Техническая часть](#техническая-часть)
 # Данные
-![image](https://user-images.githubusercontent.com/63803498/209423905-f3ca1a4a-a0ab-435c-af00-1f73bf8f8485.png)
+![image](https://user-images.githubusercontent.com/63803498/209424588-90b159ad-ffcd-45b9-a1ed-dba0a49556eb.png)
 - users - информация о пользователях
 - academgroups - информация об академических группах
 - faculty - информация о факультете
