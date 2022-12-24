@@ -13,17 +13,6 @@ module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
     return(res)
 }
 
-// check admin privilege for list
-module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
-    return executor.execute({
-        query:
-            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id " +
-            "AND academgroups.group_id = ? AND academgroups.group_admin = ?",
-        params: [list_id, group_id, user_id],
-        single: true
-    });
-}
-
 // check list accessibility
 module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
     return executor.execute({
@@ -38,7 +27,7 @@ module.exports.checkListAccess = ({ group_id, user_id, list_id }) => {
 module.exports.checkListPrivilege = ({ group_id, user_id, list_id }) => {
     return executor.execute({
         query:
-            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id" +
+            "SELECT * FROM lists, academgroups WHERE lists.list_id = ? AND lists.group_id = academgroups.group_id " +
             "AND academgroups.group_id = ? AND academgroups.group_admin = ?",
         params: [list_id, group_id, user_id],
         single: true
@@ -84,9 +73,9 @@ module.exports.getAllLists = () => {
 module.exports.getListLengthById = ({ listId }) => {
     return executor.execute({
         query:
-            "SELECT COUNT(*) FROM lists WHERE list_id = ?",
+            "SELECT * FROM question WHERE list_id = ? AND is_deleted = 0",
         params: [listId],
-        single: true
+        single: false
     });
 }
 

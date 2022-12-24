@@ -32,4 +32,8 @@ export class QuestionService {
     findQuestions(searchString: string){
         return this.http.get<question[]>(`${HOST}/api/search?question=${encodeURIComponent(searchString.toLowerCase())}`)
     }
+
+    orderChange(listid: number, orders: any){
+        return this.http.put<question>(`${HOST}/api/lists/${listid}/order_edit`, orders, getHttpOptions())
+    }
 }

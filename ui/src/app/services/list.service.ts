@@ -22,6 +22,11 @@ export class ListService {
     createList(list: list){
         return this.http.post(`${HOST}/api/lists/${list.group_id}/create-list`, list, getHttpOptions());
     }
+
+    publishList(listid: number,groupid: number){
+        return this.http.put(`${HOST}/api/lists/${groupid}/${listid}/publish`,{}, getHttpOptions());
+
+    }
     
 }
 // export const lists: list[]=[

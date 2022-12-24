@@ -16,4 +16,6 @@ router.put('/:questionid/edit', authHandler, questionController.editQuestion_put
 // exam.me/list/:listid/:questionid
 router.delete('/:questionid', authHandler, questionController.deleteQuestion_delete);
 
+router.put('/order_edit', authHandler, questionController.changeOrder_post);
+
 module.exports = router;

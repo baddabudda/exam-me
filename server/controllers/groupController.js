@@ -159,6 +159,7 @@ module.exports.createGroup_post = async (req, res) => {
 
 module.exports.editGroup_put = async (req, res) => {
     try {
+        
         let content = checkContents({
             group_name: req.body.group_name,
             course: req.body.course
@@ -172,12 +173,14 @@ module.exports.editGroup_put = async (req, res) => {
         if (req.user.user_id !== admin_id.group_admin) {
             throw new Error("Access denied: not group admin");
         }
-
+        
         await groupModel.editGroup({
-            group_id: req.params.groupid,
+            group_id: parseInt(req.params.groupid),
             group_name: req.body.group_name,
             course: req.body.course
         });
+        res.status(200).json({status: 'OK', message: 'group info edit'});
+
     } catch (error) {
         let displayError = new Error("Couldn't update group info: " + error.message);
         errorHandler({ res: res, code: 406, error: displayError.message });

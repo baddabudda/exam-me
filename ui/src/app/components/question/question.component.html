@@ -1,25 +1,72 @@
 <div style="margin-top: 2em; " class="tui-container tui-container_adaptive">
     <div class="tui-row tui-row_adaptive"  *ngIf="list_">
         <div style="margin-bottom: 1em;" class="tui-col_lg-8 tui-col_md-8 tui-col_xs-12">
-            <h2 class="headig_card" style="margin-bottom: 1em;">{{list_.list_name}}</h2>
+            <h2 class="headig_card list_heading" style="margin-bottom: 1em;">
+                <span>{{list_.list_name}}</span>
+                <button tuiIconButton 
+                    *ngIf="getEditor()"
+                    size="s" appearance="icon"
+                    [tuiHint]="!orderEditing ? 'Изменить порядок вопросов' : 'Сохранить порядок'" 
+                    [icon]="!orderEditing ? 'tuiIconSortOff' : 'tuiIconCheck'"
+                    (click)="!orderEditing ? onEditOrder() : onSaveOrder()"
+                ></button>
+            </h2>
             <div class="wrapper">
                 <p *ngIf="!questions.length">{{"Вопросы в данном списке отсутствуют" | uppercase}}</p>
                 <a tuiIsland size="s" class="list_card" *ngFor="let question of questions; index as i" routerLink="./{{question.question_id}}" [queryParams]="public ? {public: true} : {}">
-                        <h3 class="headig_card">{{question.question_order}}. {{question.question_title}}</h3>
+                        <h3 class="headig_card" style="display: flex; align-items: center; gap: 1em">
+                            <span *ngIf="!orderEditing; else orderForm">{{question.question_order}}.</span>
+                            
+                            <ng-template #orderForm>
+                                <tui-input-number
+                                    (click)="$event.preventDefault(); $event.stopPropagation();"
+                                    [(ngModel)]="question.question_order"
+                                    tuiTextfieldSize="s"
+                                    style="flex-basis: 3em;"
+                                >
+                                    <input
+                                        tuiTextfield
+                                        required
+                                    />
+                                </tui-input-number>
+                            </ng-template>
+                            {{question.question_title}}</h3>
                         <p class="tui-island__paragraph">Дата последнего редактирования: {{question.edit_date | date : 'dd.MM.YYYY'}}</p>
+                        <button 
+                            *ngIf="isAdmin"
+                            class="deleteQuestion"
+                            tuiIconButton 
+                            icon="tuiIconTrash" 
+                            appearance="secondary" 
+                            [tuiHint]="'Удалить вопрос'"
+                            size="s"
+                            (click)="$event.preventDefault(); $event.stopPropagation();onDeleteQuestion(question.question_id)"
+                            >
+                        </button>
                 </a>
-                <a tuiIsland size="s" class="list_card add_item" *ngIf="getAdmin()" (click)="!questionCreation ? questionCreation=true :addQuestion()">
+                <a tuiIsland size="s" class="list_card add_item" *ngIf="getEditor()" (click)="!questionCreation ? onNewQuestion() : addQuestion()">
                     <h3>{{!questionCreation ? 'Добавить вопрос' : 'Подтвердить'}}</h3>
                 </a>
-                <form [formGroup]="newQuest" class="creation">
-                        <tui-input formControlName="name" tuiTextfieldSize="m"  *ngIf="questionCreation" >
-                            Название
-                            <input
-                                placeholder="Название вопроса"
-                                tuiTextfield
-                                required
-                            />
-                        </tui-input>
+                <form [formGroup]="newQuest" class="creation_q" *ngIf="questionCreation">
+                    <tui-input-number
+                        formControlName="order"
+                        tuiTextfieldSize="m"
+                        style="flex-basis: 3em;"
+                        [tuiTextfieldLabelOutside]="true"
+                    >
+                        <input
+                            tuiTextfield
+                            required
+                        />
+                    </tui-input-number>
+                    <tui-input formControlName="name" tuiTextfieldSize="m" style="flex: 1;" >
+                        Название
+                        <input
+                            placeholder="Название вопроса"
+                            tuiTextfield
+                            required
+                        />
+                    </tui-input>
                 </form>
                     
             </div>
@@ -29,9 +76,13 @@
             <div size="s" class="filter_conteiner">
                 <h4 class="green headig_card" style="margin-bottom: 1em; text-transform: capitalize;">{{list_.list_name}}</h4>
                 <div class="grey">{{list_.group_name}}</div>
-                <div class="grey">Семестр {{list_.semester}}</div>
+                <div class="grey">Семестр {{list_.semester}}</div> 
+                <div class="settings" *ngIf="isAdmin">
+                    <button tuiButton size='s' class="list_card add_item" appearance="secondary" *ngIf="!list_.is_public" (click)="onPublish()">
+                        <h3>Опубликовать</h3>
+                    </button>
+                </div>
             </div>
-            
         </div>
     </div>
 </div>

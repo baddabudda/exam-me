@@ -12,22 +12,23 @@ module.exports.getAllQuestionsByListId = ({ list_id }) => {
 
 // === QUESTION inner requests ===
 module.exports.checkInDatabase = ({ questId, listId }) => {
-    return executor.execute({
+    let res = executor.execute({
         query:
             "SELECT * FROM question WHERE question_id = ? AND list_id = ? AND is_deleted = 0",
         params: [questId, listId],
-        single: true
+        single: false
     })
+    return res;
 }
 
-module.exports.checkOrder = ({ listId, order }) => {
-    return executor.execute({
-        query:
-            "SELECT * FROM question WHERE list_id = ? AND question_order = ?",
-        params: [listId, order],
-        single: true
-    });
-}
+// module.exports.checkOrder = ({ listId, order }) => {
+//     return executor.execute({
+//         query:
+//             "SELECT * FROM question WHERE list_id = ? AND question_order = ? AND is_deleted = 0",
+//         params: [listId, order],
+//         single: true
+//     });
+// }
 
 module.exports.createQuestion = ({ connection, listId, userId, date, order, title, body }) => {
     console.log(listId, userId, date, order, title, body)

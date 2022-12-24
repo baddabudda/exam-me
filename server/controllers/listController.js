@@ -21,7 +21,7 @@ const checkContents = (contents) => {
         errors.list_name = 'List name is empty';
         pass = false;
     }
-    if (!contents.is_public) {
+    if (contents.is_public == undefined) {
         errors.is_public = "List's publicity chosen";
         pass = false;
     }
@@ -89,6 +89,7 @@ module.exports.createList_post = async (req, res) => {
 // publish list
 module.exports.publishList_post = async (req, res) => {
     try {
+
         // check group membership
         if (req.user.group_id !== parseInt(req.params.groupid)) {
             throw new Error ("Can't create new list: user isn't a member of any group");
@@ -101,6 +102,7 @@ module.exports.publishList_post = async (req, res) => {
 
         // if everything is ok, create new list
         await listModel.publishList({ list_id: req.params.listid });
+        res.status(200).json();
     } catch (error) {
         errorHandler({ res: res, code: 500, error: error.message });
     }

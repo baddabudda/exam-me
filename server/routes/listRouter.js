@@ -18,7 +18,7 @@ router.use('/:listid', questionRouter);
 router.use('/public/:listid/', questionRouter);
 
 router.post('/:groupid/create-list', authHandler, listController.createList_post);
-router.post('/:groupid/:listid/publish', authHandler, listController.publishList_post);
+router.put('/:groupid/:listid/publish', authHandler, listController.publishList_post);
 
 // router.post('/:listid/create', authHandler, questionController.createQuestion_post);
 

@@ -22,7 +22,7 @@ export class GroupComponent implements OnInit {
     listCreation = false;
     newGroup = new FormGroup({
         name: new FormControl('', Validators.required),
-        course: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(50)]),
+        course: new FormControl(0, [Validators.required, Validators.min(1), Validators.max(50)]),
         faculty: new FormControl(null, Validators.required),
         program: new FormControl(null, Validators.required)
     })
@@ -44,7 +44,9 @@ export class GroupComponent implements OnInit {
         private subjectService: SubjectService
     ) { 
         auth.currentUser.subscribe(u => this.user = u ? u : undefined)
-        groupService.getGroup().subscribe(gr => this.group = gr);
+        if(this.user && this.user.group_id){
+            groupService.getGroup().subscribe(gr => this.group = gr);
+        }
         this.infoService.getFaculties().subscribe(res => this.faculties = res);
         this.infoService.getPrograms().subscribe(res => this.programs = res);
         this.subjectService.getSubjects().subscribe(res => this.subjects = res);
@@ -91,5 +93,25 @@ export class GroupComponent implements OnInit {
             this.listCreation = false;
             this.listService.getList(res.id, true).subscribe(res => this.group?.lists.push(res));
         })
+    }
+
+    onEditGroup(){
+        if(!this.group) return;
+        this.groupCreation = true;
+        this.newGroup.patchValue({
+            name: this.group.group_name,
+            course: this.group.course || 1
+        })
+    }
+
+    onSaveGroup(){
+        if(!this.group) return;
+        const updated = {...this.group, group_name: this.newGroup.controls.name.value, course: this.newGroup.controls.course.value};
+        
+        this.groupCreation = false;
+        this.groupService.editGroup(this.group.group_id, {
+            group_name: this.newGroup.controls.name.value,
+            course: this.newGroup.controls.course.value
+        }).subscribe(res=> window.location.reload())
     }
 }

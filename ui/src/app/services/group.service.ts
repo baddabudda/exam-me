@@ -18,5 +18,8 @@ export class GroupService {
     postGroup(group: Group){
         return this.httpClient.post(`${HOST}/api/group/create`, group, getHttpOptions())
     }
+    editGroup(groupid: number,group: any){
+        return this.httpClient.put(`${HOST}/api/group/${groupid}/edit`, group, getHttpOptions())
+    }
     
 }
