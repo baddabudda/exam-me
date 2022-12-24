@@ -20,6 +20,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { CookieModule } from 'ngx-cookie';
 import { GroupComponent } from "./components/group/group.component";
 import { ProfileComponent } from "./components/profile/profile.component";
+import { JoinComponent } from "./components/join.component";
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { ProfileComponent } from "./components/profile/profile.component";
     ToolbarComponent,
     LoginComponent,
     GroupComponent,
-    ProfileComponent
+    ProfileComponent,
+    JoinComponent
   ],
   imports: [
     BrowserModule,

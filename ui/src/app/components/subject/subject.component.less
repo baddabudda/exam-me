@@ -63,9 +63,13 @@ h2{
 }
 .deleteQuestion{
     position: absolute;
-    top: 1em;
+    top: 0px;
     right: -3em;
     z-index: 4;
+    &.versions{
+        top: unset;
+        bottom: 0px;
+    }
 }
 
 .list_card:has(.deleteQuestion){

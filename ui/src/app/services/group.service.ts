@@ -21,5 +21,21 @@ export class GroupService {
     editGroup(groupid: number,group: any){
         return this.httpClient.put(`${HOST}/api/group/${groupid}/edit`, group, getHttpOptions())
     }
+
+    getInvite(groupId: number){
+        return this.httpClient.get(`${HOST}/api/group/${groupId}/invite`, getHttpOptions());
+    }
+
+    joinGroup(token: string){
+        return this.httpClient.post(`${HOST}/api/group/join/${encodeURIComponent(token)}`, {},getHttpOptions());
+    }
+
+    giveAdmin(group_id: number, user_id: number){
+        return this.httpClient.put(`${HOST}/api/group/${group_id}/change-admin`, {group_id, user_id}, getHttpOptions())
+    }
+
+    expelUser(group_id: number, delete_user_id: number){
+        return this.httpClient.put(`${HOST}/api/group/${group_id}/expel`, {group_id, delete_user_id}, getHttpOptions())
+    }
     
 }

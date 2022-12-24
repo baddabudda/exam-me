@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TuiAlertService, TuiNotification } from '@taiga-ui/core';
@@ -28,6 +28,12 @@ export class QuestionComponent implements OnInit {
         })
     group?: Group;
 
+    showDeleted = false;
+    deletedQuestions: question[] = [];
+
+    showVersions = -1;
+    questionVersions: any[] = [];
+
     orderEditing = false;
     constructor(private route: ActivatedRoute,
         private questionService : QuestionService,
@@ -35,6 +41,7 @@ export class QuestionComponent implements OnInit {
         private groupService: GroupService,
         private router: Router,
         private auth: AuthService,
+        private cdRef: ChangeDetectorRef,
         @Inject(TuiAlertService) private readonly alertService: TuiAlertService
         ) 
     {
@@ -54,7 +61,6 @@ export class QuestionComponent implements OnInit {
                 if(this.list_id)
                 this.listService.getList(this.list_id,  this.public).subscribe(
                     sub=>{
-                        console.log(sub),
                         this.list_ = sub;
                     },
                     error=>router.navigate(['/subject'])
@@ -63,8 +69,8 @@ export class QuestionComponent implements OnInit {
             concatMap(qParams=> this.list_id ? this.questionService.getQuestions(this.list_id, this.public) : of([])
             )
         ).subscribe(res=>{
-            console.log(res)
-            this.questions=res.filter(q => !q.is_deleted).sort((a, b)=>a.question_order-b.question_order);
+            this.questions = res.filter(q => !q.is_deleted).sort((a, b)=>a.question_order-b.question_order);
+            this.deletedQuestions = res.filter(q => !!q.is_deleted);
         });
     }
 
@@ -137,8 +143,23 @@ export class QuestionComponent implements OnInit {
             orders: this.questions.map(q => ({question_id: q.question_id, order: q.question_order || 0}))
         }
         
-        this.questionService.orderChange(this.list_id ,orders).subscribe(res => window.location.reload())
+        this.questionService.orderChange(this.list_id ,orders).subscribe(res => window.location.reload());
+    }
 
-        console.log(orders)
+    onShowDeleted(){
+        this.showDeleted = true;
+    }
+
+    onShowVersions(question_id: number){
+        this.showVersions = question_id;
+        if(question_id == -1) {
+            this.questionVersions = [];
+            return;
+        };
+        this.questionService.getVersions(this.list_id, question_id).subscribe(res => {
+            this.questionVersions = res.sort((a: any, b: any) => {
+                return Date.parse(b.edit_date) - Date.parse(a.edit_date);
+            })
+        });
     }
 }

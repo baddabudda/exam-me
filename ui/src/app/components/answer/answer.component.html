@@ -14,14 +14,24 @@
             </ng-template>
             <div class="tools grey">
                 <span>Дата последнего изменения: {{question.edit_date | date : 'dd.MM.YYYY'}}</span>
-                <button
-                *ngIf="getAdmin()"
-                tuiButton
-                appearance="whiteblock"
-                size='s'
-                (click)="editing?on_save():on_edit()"> {{editing?'Сохранить':'Редактировать'}}</button>
+                <span *ngIf="getAdmin()">
+
+                    <button
+                    *ngIf="!version; else restore"
+                    tuiButton
+                    appearance="whiteblock"
+                    size='s'
+                    (click)="editing?on_save():on_edit()"> {{editing?'Сохранить':'Редактировать'}}</button>
+                </span>
             </div>
             
+            <ng-template #restore>
+                <button
+                    tuiButton
+                    appearance="whiteblock"
+                    size='s'
+                    (click)="onRestore()">Восстановить</button>
+            </ng-template>
         </div>
     </div>
 </div>

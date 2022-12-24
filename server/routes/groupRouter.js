@@ -15,6 +15,7 @@ router.post('/create', authHandler, groupController.createGroup_post);
 // exam.me/group/123/edit
 // router.put('/edit', authHandler, userController.editProfile_put); Lena's version
 router.put('/:groupid/edit', authHandler, groupController.editGroup_put);
+router.put('/:groupid/change-admin', authHandler, groupController.changeAdmin_put);
 // exam.me/group/123/invite
 router.get('/:groupid/invite', authHandler, groupController.generateInvitation_get);
 // exam.me/group/123/expel

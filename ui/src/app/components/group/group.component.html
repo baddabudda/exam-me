@@ -118,7 +118,29 @@
                             </tui-input-number>
                     </ng-template>
                 </div>
-                <p *ngFor="let mem of group.members">{{mem.user_fname + ' ' + mem.user_lname}}</p>
+                <div class="members">
+                    <p *ngFor="let mem of group.members">
+                        <span>
+                            {{mem.user_fname + ' ' + mem.user_lname}}
+                        </span>
+                        <span *ngIf="getAdmin() && mem.user_id != user.user_id">
+                            <button tuiIconButton size="s" appearance="icon" (click)="onGiveAdmin(mem.user_id)" icon="tuiIconUpload" [tuiHint]="'Передать права старосты'" [tuiHintAppearance]="'onDark'"></button>
+                            <button tuiIconButton size="s" appearance="icon" (click)="onExpel(mem.user_id)" icon="tuiIconTrash" [tuiHint]="'Выгнать из группы'"  [tuiHintAppearance]="'onDark'"></button>
+                        </span>
+                    </p>
+                    <button *ngIf="getAdmin()" tuiButton size="s" appearance="primary" (click)="onInvite()">Пригласить участника</button>
+                    <tui-input-copy
+                        [tuiTextfieldLabelOutside]="true"
+                        *ngIf="invitationLink.valid"
+                        [formControl]="invitationLink"
+                        tuiTextfieldSize="m"
+                        class="tui-space_vertical-4"
+                        [readOnly]="true"
+                        style="margin-bottom: 0;"
+                        >
+                    </tui-input-copy>
+                    <p  *ngIf="invitationLink.valid" style="font-size: 0.8em; opacity: 0.8; margin: 0; padding-left: 0.5em;">Ссылка доступна 5 часов</p>
+                </div>
             </div>
             
         </div>

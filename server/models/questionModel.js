@@ -144,7 +144,7 @@ module.exports.updateFromVersion = ({ connection, edit_date, version_id }) => {
         query: 
             "UPDATE question INNER JOIN versioned ON (question.question_id = versioned.question_id) " +
             "SET question.question_title = versioned.question_title, question.question_body = versioned.question_body, " +
-            "question.edit_date = ? WHERE versioned.version_id = ?",
+            "question.edit_date = ?, question.is_deleted = 0 WHERE versioned.version_id = ?",
         params: [edit_date, version_id],
         single: true
     });

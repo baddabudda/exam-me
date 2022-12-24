@@ -17,8 +17,8 @@ const verifyToken = (token) => {
         result.group_id = tmp.payload.group_id;
     } catch (error) {
         result.pass = false;
-        return result;
     }
+    return result;
 }
 
 module.exports.profile_get = async (req, res) => {
@@ -55,7 +55,7 @@ module.exports.editProfile_put = async (req, res) => {
 module.exports.joinGroup_post = async (req, res) => {
     try {
         // verify token and check whether such group exists
-        let verified = verifyToken(res.query.token);
+        let verified = verifyToken(req.params.token);
 
         if (!verified.pass) {
             throw new Error('Access token has expired');
@@ -72,6 +72,7 @@ module.exports.joinGroup_post = async (req, res) => {
         } else {
             // if everything is ok, then user can join group
             await userModel.joinGroup({ user_id: req.user.user_id, group_id: verified.group_id });
+            res.status(200).json("Redirecting to group page");
         }
         
     } catch (error) {

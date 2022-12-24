@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { concatMap, tap } from 'rxjs';
+import { concatMap, map, tap } from 'rxjs';
 import { list, question, user } from 'src/app/interfaces/interfaces';
 import { QuestionService } from 'src/app/services/question.service';
 import { Location } from '@angular/common';
-import {TUI_EDITOR_EXTENSIONS, TuiEditorTool} from '@taiga-ui/addon-editor';
+import {TUI_EDITOR_EXTENSIONS, TuiEditorTool, defaultEditorExtensions} from '@taiga-ui/addon-editor';
 import {TuiDestroyService} from '@taiga-ui/cdk';
 import { FormControl } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
@@ -18,22 +18,7 @@ import { ListService } from 'src/app/services/list.service';
         TuiDestroyService,
         {
             provide: TUI_EDITOR_EXTENSIONS,
-            useValue: [
-                import(`@taiga-ui/addon-editor/extensions/starter-kit`).then(
-                    ({StarterKit}) => StarterKit,
-                ),
-                import(`@tiptap/extension-placeholder`).then(({Placeholder}) =>
-                    Placeholder.configure({
-                        emptyNodeClass: `t-editor-placeholder`,
-                        placeholder: `Type '/' for command`, // Notion like
-                        includeChildren: true,
-                    }),
-                ),
-                import(`@taiga-ui/addon-editor/extensions/group`).then(
-                    ({createGroupExtension}) =>
-                        createGroupExtension({nested: false, createOnEnter: true}),
-                ),
-            ],
+            useValue: defaultEditorExtensions
         },
     ], 
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,12 +27,13 @@ import { ListService } from 'src/app/services/list.service';
 export class AnswerComponent implements OnInit {
     control = new FormControl<string> ('');
     question?: question;
-    builtInTools = [TuiEditorTool.Undo, TuiEditorTool.Group];
+    builtInTools = [TuiEditorTool.Undo, TuiEditorTool.Align, TuiEditorTool.Bold, TuiEditorTool.Color, TuiEditorTool.Italic, TuiEditorTool.Quote, TuiEditorTool.Underline, TuiEditorTool.Table, TuiEditorTool.Link, TuiEditorTool.List, TuiEditorTool.HR];
     editing: boolean = false;
     public = false;
     qId: number = -1;
     user?: user;
     list?: list;
+    version?: number;
 
     constructor(private route: ActivatedRoute,
         private questionService : QuestionService,
@@ -74,21 +60,34 @@ export class AnswerComponent implements OnInit {
 
     ngOnInit() {
         this.route.queryParams.pipe(
-            tap(qParams => this.public = !!qParams['public']),
+            tap(qParams => {
+                this.public = !!qParams['public'];
+                this.version = qParams['version'];
+            }),
             concatMap(qp => this.route.params),
             tap(params => {
                 this.qId = parseInt(params['question_id']);
                 this.listService.getList(params['list_id'], this.public).subscribe(list => this.list = list);
             }),
-            concatMap(params=>this.questionService.getQuestions( params['list_id'], this.public))
+            concatMap(params=> {
+                return this.version ?
+                 this.questionService.getVersions(params['list_id'], this.qId).pipe(map(versions => versions.find((v: any) => v.version_id == this.version))) : 
+                 this.questionService.getQuestion( params['list_id'], this.qId, this.public)
+            })
         ).subscribe(res=>{
-            this.question = res.find(q => q.question_id == this.qId) as question; 
-            this.control.setValue(this.question.question_body);
+            this.question = res;
+            this.control.setValue(this.question?.question_body || '');
             this.cdRef.detectChanges();
         }, error=>this.location.back());
      }
 
     getAdmin(){
         return !!this.user && !!this.list && this.user.group_id == this.list.group_id
+    }
+    onRestore(){
+        if(!this.list || !this.version) return;
+        this.questionService.setVersion(this.list.list_id, this.qId, this.version).subscribe(
+            res => this.router.navigate(['list', this.list?.list_id])
+        )
     }
 }

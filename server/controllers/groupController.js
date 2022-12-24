@@ -220,7 +220,7 @@ module.exports.generateInvitation_get = async (req, res) => {
         }
     
         // exam.me/join/group/:access_token
-        res.status(200).json(`${process.env.UI_HOST}/join/:${token}`);
+        res.status(200).json(`${process.env.UI_HOST}/join/${token}`);
     } catch (error) {
         errorHandler({ res: res, error: error });
     }
@@ -336,7 +336,7 @@ module.exports.changeAdmin_put = async (req, res) => {
         }
         // check if user has been blocked by the group
         let isBlocked = await userModel.checkInBlackList({ group_id: req.body.group_id, user_id: req.body.user_id });
-        if (!isBlocked) {
+        if (isBlocked) {
             throw new Error ("405 Can't reassign admin : user is blocked ");
         }
         // check whether user belongs to the group

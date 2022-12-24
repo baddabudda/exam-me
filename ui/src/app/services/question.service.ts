@@ -36,4 +36,11 @@ export class QuestionService {
     orderChange(listid: number, orders: any){
         return this.http.put<question>(`${HOST}/api/lists/${listid}/order_edit`, orders, getHttpOptions())
     }
+
+    getVersions(list_id: number,  question_id: number){
+        return this.http.get<question[]>(`${HOST}/api/lists/${list_id}/${question_id}/versions`, getHttpOptions())
+    }
+    setVersion(list_id: number, question_id: number, version_id: number){
+        return this.http.put(`${HOST}/api/lists/${list_id}/${question_id}/${version_id}`, {list_id, question_id, version_id}, getHttpOptions())
+    }
 }

@@ -48,7 +48,7 @@ module.exports.assignToken = ({ group_id, access_token }) => {
 module.exports.getToken = ({ group_id }) => {
     return executor.execute({
         query:
-            "SELECT token FROM academgroups WHERE group_id = ?",
+            "SELECT access_token FROM academgroups WHERE group_id = ?",
         params: [group_id],
         single: true
     });

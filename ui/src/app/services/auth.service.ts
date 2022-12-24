@@ -47,6 +47,5 @@ export function getHttpOptions(){
         }) ,
         withCredentials: true
     }
-    console.log(httpOptions)
     return httpOptions;
 }

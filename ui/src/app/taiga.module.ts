@@ -12,7 +12,7 @@ import {
     TuiDataListModule,
     TuiHintModule
 } from "@taiga-ui/core";
-import {TuiDataListWrapperModule, TuiInputModule, TuiInputNumberModule, TuiIslandModule, TuiRadioModule, TuiSelectModule} from '@taiga-ui/kit';
+import {TuiDataListWrapperModule, TuiInputCopyModule, TuiInputModule, TuiInputNumberModule, TuiIslandModule, TuiRadioModule, TuiSelectModule} from '@taiga-ui/kit';
 import {TuiActiveZoneModule, TuiAutoFocusModule} from '@taiga-ui/cdk';
 import {
     TuiAlignContentModule,
@@ -92,6 +92,7 @@ import {
     TuiDataListWrapperModule,
     TuiSelectModule,
     TuiInputNumberModule,
-    TuiHintModule
+    TuiHintModule,
+    TuiInputCopyModule
 ]})
 export class TaigaModule{}

@@ -12,40 +12,24 @@
                 ></button>
             </h2>
             <div class="wrapper">
-                <p *ngIf="!questions.length">{{"Вопросы в данном списке отсутствуют" | uppercase}}</p>
-                <a tuiIsland size="s" class="list_card" *ngFor="let question of questions; index as i" routerLink="./{{question.question_id}}" [queryParams]="public ? {public: true} : {}">
-                        <h3 class="headig_card" style="display: flex; align-items: center; gap: 1em">
-                            <span *ngIf="!orderEditing; else orderForm">{{question.question_order}}.</span>
-                            
-                            <ng-template #orderForm>
-                                <tui-input-number
-                                    (click)="$event.preventDefault(); $event.stopPropagation();"
-                                    [(ngModel)]="question.question_order"
-                                    tuiTextfieldSize="s"
-                                    style="flex-basis: 3em;"
-                                >
-                                    <input
-                                        tuiTextfield
-                                        required
-                                    />
-                                </tui-input-number>
-                            </ng-template>
-                            {{question.question_title}}</h3>
-                        <p class="tui-island__paragraph">Дата последнего редактирования: {{question.edit_date | date : 'dd.MM.YYYY'}}</p>
-                        <button 
-                            *ngIf="isAdmin"
-                            class="deleteQuestion"
-                            tuiIconButton 
-                            icon="tuiIconTrash" 
-                            appearance="secondary" 
-                            [tuiHint]="'Удалить вопрос'"
-                            size="s"
-                            (click)="$event.preventDefault(); $event.stopPropagation();onDeleteQuestion(question.question_id)"
-                            >
-                        </button>
-                </a>
+
+                <ng-container *ngTemplateOutlet="quest; context: {arr: questions, deleted: false}"></ng-container>
+
                 <a tuiIsland size="s" class="list_card add_item" *ngIf="getEditor()" (click)="!questionCreation ? onNewQuestion() : addQuestion()">
                     <h3>{{!questionCreation ? 'Добавить вопрос' : 'Подтвердить'}}</h3>
+                    <button 
+                        *ngIf="isAdmin"
+                        class="deleteQuestion"
+                        style="top: 5px"
+                        tuiIconButton 
+                        icon="tuiIconTrash" 
+                        appearance="primary" 
+                        [tuiHint]="'Удаленные вопросы'"
+                        [tuiHintAppearance]="'onDark'"
+                        size="s"
+                        (click)="$event.preventDefault(); $event.stopPropagation(); this.showDeleted = !this.showDeleted"
+                        >
+                    </button>
                 </a>
                 <form [formGroup]="newQuest" class="creation_q" *ngIf="questionCreation">
                     <tui-input-number
@@ -68,7 +52,10 @@
                         />
                     </tui-input>
                 </form>
-                    
+                <ng-container *ngIf="showDeleted">
+
+                    <ng-container *ngTemplateOutlet="quest; context: {arr: deletedQuestions, deleted: true}"></ng-container>
+                </ng-container>
             </div>
 
         </div>
@@ -86,3 +73,80 @@
         </div>
     </div>
 </div>
+
+<ng-template #quest let-deleted="deleted" let-arr='arr'>
+    <p *ngIf="!arr.length">{{"Вопросы в данном списке отсутствуют" | uppercase}}</p>
+    <a tuiIsland 
+        size="s" class="list_card" 
+        *ngFor="let question of arr; index as i" 
+        routerLink="./{{question.question_id}}" 
+        [queryParams]="public ? {public: true} : {}" 
+        [tuiDropdown]="dropdownContent"
+        [tuiDropdownManual]="showVersions == question.question_id"
+        [tuiDropdownLimitWidth]="'fixed'"
+        (tuiActiveZoneChange)="onShowVersions(-1)"
+    >
+        <h3 class="headig_card" style="display: flex; align-items: center; gap: 1em">
+            <span *ngIf="!orderEditing; else orderForm">{{question.question_order}}.</span>
+            
+            <ng-template #orderForm>
+                <tui-input-number
+                    (click)="$event.preventDefault(); $event.stopPropagation();"
+                    [(ngModel)]="question.question_order"
+                    tuiTextfieldSize="s"
+                    style="flex-basis: 3em;"
+                >
+                    <input
+                        tuiTextfield
+                        required
+                    />
+                </tui-input-number>
+            </ng-template>
+            {{question.question_title}}</h3>
+        <p class="tui-island__paragraph">Дата последнего редактирования: {{question.edit_date | date : 'dd.MM.YYYY hh:mm'}}</p>
+        <button 
+            *ngIf="isAdmin"
+            class="deleteQuestion"
+            tuiIconButton 
+            icon="tuiIconTime" 
+            appearance="secondary" 
+            [tuiHint]="'Версии вопроса'"
+            size="s"
+            (click)="$event.preventDefault(); $event.stopPropagation(); onShowVersions(question.question_id)"
+            >
+        </button>
+        <button 
+            *ngIf="isAdmin && !deleted"
+            class="deleteQuestion versions"
+            tuiIconButton 
+            icon="tuiIconTrash" 
+            appearance="secondary" 
+            [tuiHint]="'Удалить вопрос'"
+            size="s"
+            (click)="$event.preventDefault(); $event.stopPropagation();onDeleteQuestion(question.question_id)"
+            >
+        </button>
+        <ng-template #dropdownContent>
+            <ng-container *ngIf="(deleted ? questionVersions : questionVersions.slice(1)) as versions">
+                <div class="wrapper" *ngIf="versions.length; else noVersions">
+                    <a tuiIsland 
+                        size="s" class="list_card" 
+                        *ngFor="let v of versions"
+                        routerLink="./{{question.question_id}}" 
+                        [queryParams]="{version: v.version_id}" >
+                        <h3 class="headig_card">
+                            {{v.question_title}}
+                        </h3>
+                        <p class="tui-island__paragraph">Дата последнего редактирования: {{v.edit_date | date : 'dd.MM.YYYY hh:mm'}}</p>
+                    </a>
+                </div>
+            </ng-container>
+
+            <ng-template #noVersions>
+                <div class="wrapper">
+                    Для этого вопроса еще нет других версий 
+                </div>
+            </ng-template>
+        </ng-template>  
+</a>
+</ng-template>

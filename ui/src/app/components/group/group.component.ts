@@ -36,6 +36,9 @@ export class GroupComponent implements OnInit {
     faculties: Faculty[] = [];
     programs: Program[] = [];
     subjects: subject[] = [];
+
+    invitationLink = new FormControl('', Validators.required)
+
     constructor(
         private groupService: GroupService,
         private infoService: InfoService,
@@ -113,5 +116,23 @@ export class GroupComponent implements OnInit {
             group_name: this.newGroup.controls.name.value,
             course: this.newGroup.controls.course.value
         }).subscribe(res=> window.location.reload())
+    }
+
+    onInvite(){
+        if(!this.group) return;
+        this.groupService.getInvite(this.group.group_id).subscribe(
+            res => {
+                this.invitationLink.setValue(res as string)
+            }
+        )
+    }
+
+    onGiveAdmin(userId: number){
+        if(!this.group) return;
+        this.groupService.giveAdmin(this.group.group_id, userId).subscribe(res => window.location.reload())
+    }
+    onExpel(userId: number){
+        if(!this.group) return;
+        this.groupService.expelUser(this.group.group_id, userId).subscribe(res => window.location.reload())
     }
 }
