@@ -189,13 +189,13 @@ module.exports.editQuestion_put = async (req, res) => {
         }
 
         // check whether question with such order exists
-        let orderCheck = await questionModel.checkOrder({
-            listId: req.body.list_id,
-            order: req.body.question_order
-        });
-        if (orderCheck && orderCheck.question_id !== parseInt(req.body.question_id)) {
-            console.log('Question with such order already exists');
-        }
+        // let orderCheck = await questionModel.checkOrder({
+        //     listId: req.body.list_id,
+        //     order: req.body.question_order
+        // });
+        // if (orderCheck && orderCheck.question_id !== parseInt(req.body.question_id)) {
+        //     console.log('Question with such order already exists');
+        // }
         // if (orderCheck) {
         //     res.status(204).json({ success: true, message: 'Question with such order already exists' });
         //     return;
@@ -248,7 +248,6 @@ module.exports.editQuestion_put = async (req, res) => {
                     title: req.body.question_title, 
                     body: req.body.question_body
                 });
-                console.log('checkExistence')
                 // the end of transaction: commit changes and release connection
                 await connection.commit();
                 pool.releaseConnection(connection);
