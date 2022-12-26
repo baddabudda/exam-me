@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter, tap } from 'rxjs';
+import { BehaviorSubject, catchError, filter, of, OperatorFunction, tap } from 'rxjs';
 import { user } from '../interfaces/interfaces';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { HOST } from 'src/config';
@@ -22,9 +22,15 @@ export class AuthService {
     }
 
     updateUser(){
-        this.http.get(`${HOST}/api/profile`, getHttpOptions()).subscribe((resp: any) => {
-            this.currentUserSubject.next(resp.user)
-        }, err => this.currentUserSubject.next(null) )
+        this.http.get<{user: user}>(`${HOST}/api/profile`, getHttpOptions())
+        .pipe(
+            catchError(err => {
+                return of(null);
+            })
+        )
+        .subscribe(resp  => {
+            this.currentUserSubject.next(resp ? resp.user : null)
+        } )
     }
 
     getProfile(){

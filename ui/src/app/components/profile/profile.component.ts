@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { concatMap, tap } from 'rxjs';
+import { concatMap, of, tap } from 'rxjs';
 import { Group, user } from 'src/app/interfaces/interfaces';
 import { AuthService } from 'src/app/services/auth.service';
 import { GroupService } from 'src/app/services/group.service';
@@ -23,7 +23,7 @@ export class ProfileComponent implements OnInit {
     ) { 
         auth.currentUser.pipe(
             tap(user => this.user = user ? user : undefined),
-            concatMap(user =>  groupService.getGroup())
+            concatMap(user => user?.group_id ? groupService.getGroup() : of(undefined))
         ).subscribe(group => this.group = group);
     }
 

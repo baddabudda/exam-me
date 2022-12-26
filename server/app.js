@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const passport = require('passport');
 const cookieSession = require('cookie-session');
 const cors = require('cors')
-
+const path = require('path');
 // === INNER PROJECT REQUIREMENTS ===
 // --- Configuration, etc. ---
 const keys = require('./config/keys.js');
@@ -50,9 +50,10 @@ app.use(cors({origin: process.env.UI_HOST, credentials: true}));
 app.use('/api', singleRoutes);
 app.use('/auth', authRoutes);
 
-app.get('/', (req, res) => {
-    res.send("Hello, world!")
-})
+app.use(express.static(__dirname + '/../dist/exam_me/'));
+app.get('/*', function(req, res) {
+    res.sendFile(path.join(__dirname + '/../dist/exam_me/index.html'));
+});
 
 app.listen(PORT, () => console.log(`Exam Me backend is working...`));
 
