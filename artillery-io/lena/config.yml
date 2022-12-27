@@ -1,0 +1,67 @@
+config:
+  target: "http://localhost:3000/api"
+  plugins:
+    expect: {}
+  phases:
+    - duration: 10
+      arrivalRate: 20
+      name: StressTest
+  payload:
+    - path: "all-csv/userSessions.csv"
+      fields:
+        - "session.sig"
+        - "session"
+    - path: "all-csv/groups.csv"
+      fields:
+        - "group_id"
+    - path: "all-csv/listData.csv"
+      fields:
+        - "subject_id"
+        - "list_name"
+        - "is_public"
+        - "semester"
+
+scenarios:
+  - name: "create private list"
+    flow:
+      - post:
+          url: "/lists/{{ group_id }}/create-list"
+          cookie:
+            session: "{{ session }}"
+            session.sig: "{{ session.sig }}"
+          json:
+            subject_id: "{{ subject_id }}"
+            list_name: "{{ list_name }}"
+            is_public: "{{ is_public }}"
+            semester: "{{ semester }}"
+          capture:
+            json: "$.listInfo"
+            as: "listInfo"
+          expect:
+            - statusCode:
+              - 200
+              - 500
+  - name: "get user profile"
+    flow:
+      - get:
+          url: "/profile/"
+          cookie:
+              session: "{{ session }}"
+              session.sig: "{{ session.sig }}"
+          expect:
+            - statusCode:
+              - 200
+              - 401
+  - name: "get group info"
+    flow:
+      - get:
+          url: "/group/{{ group_id }}"
+          cookie:
+              session: "{{ session }}"
+              session.sig: "{{ session.sig }}"
+          expect:
+            - statusCode:
+              - 200
+              - 403
+
+  

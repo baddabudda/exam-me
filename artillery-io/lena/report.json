@@ -1,0 +1,81 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.get user profile": 67,
+      "vusers.created": 200,
+      "http.requests": 200,
+      "vusers.created_by_name.get group info": 69,
+      "vusers.created_by_name.create private list": 64,
+      "errors.ETIMEDOUT": 200,
+      "vusers.failed": 200
+    },
+    "rates": {
+      "http.request_rate": 14
+    },
+    "firstCounterAt": 1672107565047,
+    "lastCounterAt": 1672107585031,
+    "firstMetricAt": 1672107565047,
+    "lastMetricAt": 1672107585031,
+    "period": 1672107580000,
+    "summaries": {},
+    "histograms": {}
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.get user profile": 33,
+        "vusers.created": 99,
+        "http.requests": 99,
+        "vusers.created_by_name.get group info": 32,
+        "vusers.created_by_name.create private list": 34
+      },
+      "rates": {
+        "http.request_rate": 20
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1672107565047,
+      "lastCounterAt": 1672107569956,
+      "firstMetricAt": 1672107565047,
+      "lastMetricAt": 1672107569956,
+      "period": "1672107560000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.create private list": 30,
+        "vusers.created": 101,
+        "http.requests": 101,
+        "vusers.created_by_name.get group info": 37,
+        "vusers.created_by_name.get user profile": 34,
+        "errors.ETIMEDOUT": 99,
+        "vusers.failed": 99
+      },
+      "rates": {
+        "http.request_rate": 20
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1672107570025,
+      "lastCounterAt": 1672107579966,
+      "firstMetricAt": 1672107570025,
+      "lastMetricAt": 1672107579966,
+      "period": "1672107570000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "errors.ETIMEDOUT": 101,
+        "vusers.failed": 101
+      },
+      "rates": {},
+      "firstCounterAt": 1672107580040,
+      "lastCounterAt": 1672107585031,
+      "firstMetricAt": 1672107580040,
+      "lastMetricAt": 1672107585031,
+      "period": "1672107580000",
+      "summaries": {},
+      "histograms": {}
+    }
+  ]
+}
