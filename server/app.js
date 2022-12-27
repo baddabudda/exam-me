@@ -50,10 +50,23 @@ app.use(cors({origin: process.env.UI_HOST, credentials: true}));
 app.use('/api', singleRoutes);
 app.use('/auth', authRoutes);
 
-app.use(express.static(__dirname + '/../dist/exam_me/'));
+// for docker
+// app.use(express.static('./ui/dist/exam_me'));
+// app.get('/*', function(req, res) {
+//     res.sendFile('./ui/dist/exam_me/index.html');
+// })
+
+// importing dist here
+// app.use(express.static('C:/Users/IR/Documents/GitHub/db-n-web/ui/dist/exam_me'));
+// app.get('/*', function(req, res) {
+//     res.sendFile('C:/Users/IR/Documents/GitHub/db-n-web/ui/dist/exam_me/index.html');
+// })
+// Lena's commit
+app.use(express.static(__dirname + '/exam_me/'));
 app.get('/*', function(req, res) {
-    res.sendFile(path.join(__dirname + '/../dist/exam_me/index.html'));
+    res.sendFile(path.join(__dirname + '/exam_me/index.html'));
 });
+// console.log(path.join(__dirname + '/exam_me/index.html'));
 
 app.listen(PORT, () => console.log(`Exam Me backend is working...`));
 

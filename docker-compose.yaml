@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  mysql:
+    build: ./database
+    container_name: db_c
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=webdb
+    ports:
+      - '3306:3306'
+  server:
+    build: ./server
+    container_name: api_c
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysql

@@ -1,0 +1,51 @@
+config:
+  target: "http://localhost:3000/api"
+  plugins:
+    expect: {}
+  phases:
+    - duration: 10
+      arrivalRate: 20
+      name: StressTest
+  payload:
+    - path: "all-csv/userSessions.csv"
+      fields:
+        - "session.sig"
+        - "session"
+    - path: "all-csv/subjects.csv"
+      fields:
+        - "subject_id"
+    - path: "all-csv/publicLists.csv"
+      fields:
+        - "public_list_id"
+    - path: "all-csv/privateLists.csv"
+      fields:
+        - "private_list_id"
+
+scenarios:
+  - name: "get all public lists by subject id"
+    flow:
+      - get:
+          url: "/lists/public/subject/{{ subject_id }}"
+          expect:
+            - statusCode: 200
+  - name: "get specific public list by id"
+    flow:
+      - get:
+          url: "/lists/public/{{ public_list_id }}"
+          expect:
+            - statusCode: 200
+  - name: "get private list"
+    flow:
+      - get:
+          url: "/lists/{{ private_list_id }}"
+          cookie:
+            session: "{{ session }}"
+            session.sig: "{{ session.sig }}"
+          capture:
+            json: "$.listInfo"
+            as: "listInfo"
+          expect:
+            - statusCode:
+              - 200
+              - 500
+  
